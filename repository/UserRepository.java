@@ -1,9 +1,9 @@
 package repository;
 
+import entity.user.Admin;
 import entity.user.RegularUser;
 import entity.user.ResourceManager;
 import entity.user.User;
-import entity.user.admin;
 import java.util.*;
 
 public class UserRepository {
@@ -14,7 +14,7 @@ public class UserRepository {
 
     public UserRepository() {
         // Preloading a single admin user 
-        User adminUser = new admin(userIdCounter, "Admin", "admin@system.com", "admin123", 35);
+        User adminUser = new Admin(userIdCounter, "Admin", "admin@system.com", "admin123", 35);
         resourceManagerMap.put(adminUser.getId(), (ResourceManager) adminUser);
         userIdCounter++; // Increment after assigning admin ID
     }
