@@ -1,6 +1,6 @@
 public class Room {
     private String roomId;
-    private String type; // e.g., 2AC, 4NAC
+    private String type; 
     private boolean isAvailable;
 
     public Room(String roomId, String type, boolean isAvailable) {
