@@ -3,7 +3,7 @@ package entity;
 
 public class WellnessFacility {
     private String facilityId;
-    private String type; //Swimming Pool, Gym
+    private String type; // Swimming Pool, Gym
     private boolean isAvailable;
 
     public WellnessFacility(String facilityId, String type, boolean isAvailable) {
@@ -36,4 +36,3 @@ public class WellnessFacility {
         isAvailable = available;
     }
 }
-
