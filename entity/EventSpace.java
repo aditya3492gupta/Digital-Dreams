@@ -1,4 +1,4 @@
-package srbms.entity.resource;
+package entity;
 
 public class EventSpace {
     private String spaceId;
