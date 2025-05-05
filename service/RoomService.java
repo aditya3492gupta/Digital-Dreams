@@ -3,7 +3,7 @@ package service;
 import java.util.List;
 
 import entity.Room;
-import repository.RoomRepository;Repository;
+import repository.RoomRepository;
 
 public class RoomService {
     private RoomRepository roomRepository;

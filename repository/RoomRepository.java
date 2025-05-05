@@ -31,6 +31,20 @@ public class RoomRepository {
         }
     }
 
+    // Add a room to the inventory
+    public boolean addRoom(Room room) {
+        roomInventory.putIfAbsent(room.getType(), new ArrayList<>());
+
+        for (Room r : roomInventory.get(room.getType())) {
+            if (r.getRoomId().equalsIgnoreCase(room.getRoomId())) {
+                return false; // Duplicate
+            }
+        }
+
+        roomInventory.get(room.getType()).add(room);
+        return true;
+    }
+
     // Get all rooms of a type
     public List<Room> getRoomsByType(String type) {
         return roomInventory.getOrDefault(type, new ArrayList<>());
@@ -79,5 +93,26 @@ public class RoomRepository {
             long available = entry.getValue().stream().filter(Room::isAvailable).count();
             System.out.println(entry.getKey() + ": " + available + " available");
         }
+    }
+
+    // Get all rooms in the inventory
+    public List<Room> getAllRooms() {
+        List<Room> allRooms = new ArrayList<>();
+        for (List<Room> rooms : roomInventory.values()) {
+            allRooms.addAll(rooms);
+        }
+        return allRooms;
+    }
+
+    // Get a room by its ID
+    public Room getRoomById(String roomId) {
+        for (List<Room> rooms : roomInventory.values()) {
+            for (Room room : rooms) {
+                if (room.getRoomId().equalsIgnoreCase(roomId)) {
+                    return room;
+                }
+            }
+        }
+        return null;
     }
 }

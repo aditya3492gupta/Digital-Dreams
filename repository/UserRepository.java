@@ -3,7 +3,7 @@ package repository;
 import entity.user.RegularUser;
 import entity.user.ResourceManager;
 import entity.user.User;
-import entity.user.admin;
+import entity.user.Admin;
 import java.util.*;
 
 public class UserRepository {
@@ -13,8 +13,8 @@ public class UserRepository {
     private static int userIdCounter = 1;
 
     public UserRepository() {
-        // Preloading a single admin user 
-        User adminUser = new admin(userIdCounter, "Admin", "admin@system.com", "admin123", 35);
+        // Preloading a single admin user
+        User adminUser = new Admin(userIdCounter, "Admin", "admin@system.com", "admin123", 35);
         resourceManagerMap.put(adminUser.getId(), (ResourceManager) adminUser);
         userIdCounter++; // Increment after assigning admin ID
     }
@@ -119,6 +119,6 @@ public class UserRepository {
         return regularUserMap.values().stream()
                 .anyMatch(user -> user.getEmail().equalsIgnoreCase(email)) ||
                 resourceManagerMap.values().stream()
-                .anyMatch(user -> user.getEmail().equalsIgnoreCase(email));
+                        .anyMatch(user -> user.getEmail().equalsIgnoreCase(email));
     }
 }
