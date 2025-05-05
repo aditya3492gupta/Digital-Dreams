@@ -1,7 +1,4 @@
 package entity;
-
-
-
 public class GoldEventSpace extends EventSpace {
     private double bookingCost;
     private boolean hasCatering;

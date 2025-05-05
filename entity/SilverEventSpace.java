@@ -1,7 +1,5 @@
 package entity;
 
-
-
 public class SilverEventSpace extends EventSpace {
     private double bookingCost;
     private boolean hasCatering;
