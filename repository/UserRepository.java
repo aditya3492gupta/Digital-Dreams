@@ -1,126 +1,80 @@
 package repository;
 
-import entity.user.Admin;
-import entity.user.RegularUser;
-import entity.user.ResourceManager;
-import entity.user.User;
+import entity.user.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class UserRepository {
 
-    private final Map<Integer, RegularUser> regularUserMap = new HashMap<>();
-    private final Map<Integer, ResourceManager> resourceManagerMap = new HashMap<>();
-    private static int userIdCounter = 1;
+    private final List<User> users = new ArrayList<>();
 
-    public UserRepository() {
-        // Preloading a single admin user 
-        User adminUser = new Admin(userIdCounter, "Admin", "admin@system.com", "admin123", 35);
-        resourceManagerMap.put(adminUser.getId(), (ResourceManager) adminUser);
-        userIdCounter++; // Increment after assigning admin ID
+    // Add a user
+    public void addUser(User user) {
+        users.add(user);
     }
 
-    // Generate unique user ID
-    public int generateUserId() {
-        return userIdCounter++;
+    // Remove a user by ID
+    public boolean removeUserById(int id) {
+        return users.removeIf(user -> user.getId() == id);
     }
 
-    // Add new regular user
-    public void addRegularUser(RegularUser user) {
-        regularUserMap.put(user.getId(), user);
+    // Find a user by ID
+    public Optional<User> findUserById(int id) {
+        return users.stream()
+                .filter(user -> user.getId() == id)
+                .findFirst();
     }
 
-    // Add new resource manager
-    public void addResourceManager(ResourceManager user) {
-        resourceManagerMap.put(user.getId(), user);
+    // Find a user by email
+    public Optional<User> findUserByEmail(String email) {
+        return users.stream()
+                .filter(user -> user.getEmail().equalsIgnoreCase(email))
+                .findFirst();
     }
 
-    // Get regular user by ID
-    public RegularUser getRegularUserById(int id) {
-        return regularUserMap.get(id);
+    // Authenticate a user by email and password
+    public boolean authenticate(String email, String password) {
+        return users.stream()
+                .anyMatch(user -> user.getEmail().equalsIgnoreCase(email) && user.getPassword().equals(password));
     }
 
-    // Get resource manager by ID
-    public ResourceManager getResourceManagerById(int id) {
-        return resourceManagerMap.get(id);
+    // List all users
+    public List<User> getAllUsers() {
+        return new ArrayList<>(users);
     }
 
-    // Get user by Email (searches both maps)
-    public User getUserByEmail(String email) {
-        User user = regularUserMap.values().stream()
-                .filter(u -> u.getEmail().equalsIgnoreCase(email))
-                .findFirst().orElse(null);
-
-        if (user == null) {
-            user = resourceManagerMap.values().stream()
-                    .filter(u -> u.getEmail().equalsIgnoreCase(email))
-                    .findFirst().orElse(null);
-        }
-
-        return user;
-    }
-
-    // Authenticate user (searches both maps)
-    public User authenticate(String email, String password) {
-        User user = regularUserMap.values().stream()
-                .filter(u -> u.getEmail().equalsIgnoreCase(email)
-                        && u.getPassword().equals(password))
-                .findFirst().orElse(null);
-
-        if (user == null) {
-            user = resourceManagerMap.values().stream()
-                    .filter(u -> u.getEmail().equalsIgnoreCase(email)
-                            && u.getPassword().equals(password))
-                    .findFirst().orElse(null);
-        }
-
-        return user;
-    }
-
-    // Get all regular users
-    public List<RegularUser> getAllRegularUsers() {
-        return new ArrayList<>(regularUserMap.values());
-    }
-
-    // Get all resource managers
+    // List only ResourceManagers
     public List<ResourceManager> getAllResourceManagers() {
-        return new ArrayList<>(resourceManagerMap.values());
-    }
-
-    // Update regular user
-    public boolean updateRegularUser(int id, RegularUser updatedUser) {
-        if (regularUserMap.containsKey(id)) {
-            regularUserMap.put(id, updatedUser);
-            return true;
+        List<ResourceManager> managers = new ArrayList<>();
+        for (User user : users) {
+            if (user instanceof ResourceManager) {
+                managers.add((ResourceManager) user);
+            }
         }
-        return false;
+        return managers;
     }
 
-    // Update resource manager
-    public boolean updateResourceManager(int id, ResourceManager updatedUser) {
-        if (resourceManagerMap.containsKey(id)) {
-            resourceManagerMap.put(id, updatedUser);
-            return true;
+    // List only RegularUsers
+    public List<RegularUser> getAllRegularUsers() {
+        List<RegularUser> regularUsers = new ArrayList<>();
+        for (User user : users) {
+            if (user instanceof RegularUser) {
+                regularUsers.add((RegularUser) user);
+            }
         }
-        return false;
+        return regularUsers;
     }
 
-    // Delete regular user
-    public boolean deleteRegularUser(int id) {
-        return regularUserMap.remove(id) != null;
-    }
-
-    // Delete resource manager
-    public boolean deleteResourceManager(int id) {
-        return resourceManagerMap.remove(id) != null;
-    }
-
-    // Check if email is already registered (searches both maps)
-    public boolean isEmailTaken(String email) {
-        return regularUserMap.values().stream()
-                .anyMatch(user -> user.getEmail().equalsIgnoreCase(email)) ||
-                resourceManagerMap.values().stream()
-                .anyMatch(user -> user.getEmail().equalsIgnoreCase(email));
-
+    // List all Admins
+    public List<Admin> getAllAdmins() {
+        List<Admin> admins = new ArrayList<>();
+        for (User user : users) {
+            if (user instanceof Admin) {
+                admins.add((Admin) user);
+            }
+        }
+        return admins;
     }
 }
