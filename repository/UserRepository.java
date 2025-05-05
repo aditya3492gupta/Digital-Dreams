@@ -4,6 +4,7 @@ import entity.user.Admin;
 import entity.user.RegularUser;
 import entity.user.ResourceManager;
 import entity.user.User;
+
 import java.util.*;
 
 public class UserRepository {
@@ -120,5 +121,6 @@ public class UserRepository {
                 .anyMatch(user -> user.getEmail().equalsIgnoreCase(email)) ||
                 resourceManagerMap.values().stream()
                 .anyMatch(user -> user.getEmail().equalsIgnoreCase(email));
+
     }
 }
