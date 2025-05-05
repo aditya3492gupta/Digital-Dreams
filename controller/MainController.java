@@ -41,7 +41,7 @@ public class MainController {
             System.out.println("2. Regular User Login");
             System.out.println("3. Resource Manager Login");
             System.out.println("4. Register as Regular User");
-            // System.out.println("5. Register as Resource Manager");
+
             System.out.println("5. Exit");
             System.out.print("Enter your choice: ");
             int choice = Integer.parseInt(scanner.nextLine());
