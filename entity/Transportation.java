@@ -1,48 +1,34 @@
 package entity;
 
 public class Transportation {
+	private String vehicleId;
+	private String vehicleType;
+	private boolean available;
 
-	private String VehicleId;
-	private String type;
-	private boolean isAvailable;
-
-	public Transportation(String VehicleId, String type, boolean isAvailable) {
-		this.VehicleId = VehicleId;
-		this.type = type;
-		this.isAvailable = isAvailable;
-
+	public Transportation(String vehicleId, String vehicleType, boolean available) {
+		this.vehicleId = vehicleId;
+		this.vehicleType = vehicleType;
+		this.available = available;
 	}
 
 	public String getVehicleId() {
-		return VehicleId;
-
+		return vehicleId;
 	}
 
-	public void setVehicleId(String VehicleId) {
-		this.VehicleId = VehicleId;
+	public String getVehicleType() {
+		return vehicleType;
 	}
 
-	public String getType() {
-		return type;
-
+	public boolean isAvailable() {
+		return available;
 	}
 
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public boolean getAvailable() {
-		return isAvailable;
-
-	}
-
-	public void setAvailable(boolean isAvailable) {
-		this.isAvailable = isAvailable;
+	public void setAvailable(boolean available) {
+		this.available = available;
 	}
 
 	@Override
 	public String toString() {
-		return "Transportation [VehicleId=" + VehicleId + ", type=" + type + ", isAvailable=" + isAvailable + "]";
+		return "ID: " + vehicleId + ", Type: " + vehicleType + ", Available: " + available;
 	}
-
 }
