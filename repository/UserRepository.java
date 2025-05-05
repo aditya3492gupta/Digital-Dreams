@@ -11,13 +11,14 @@ public class UserRepository {
 
     private final Map<Integer, RegularUser> regularUserMap = new HashMap<>();
     private final Map<Integer, ResourceManager> resourceManagerMap = new HashMap<>();
+    private final Map<Integer, Admin> adminMap = new HashMap<>();
     private static int userIdCounter = 1;
 
     public UserRepository() {
-        // Preloading a single admin user 
-        User adminUser = new Admin(userIdCounter, "Admin", "admin@system.com", "admin123", 35);
-        resourceManagerMap.put(adminUser.getId(), (ResourceManager) adminUser);
-        userIdCounter++; // Increment after assigning admin ID
+        // Preload a default admin
+        Admin adminUser = new Admin(userIdCounter, "Admin", "admin@system.com", "admin123", 35);
+        adminMap.put(adminUser.getId(), adminUser);
+        userIdCounter++;
     }
 
     // Generate unique user ID
@@ -35,6 +36,11 @@ public class UserRepository {
         resourceManagerMap.put(user.getId(), user);
     }
 
+    // Add new admin (if needed)
+    public void addAdmin(Admin admin) {
+        adminMap.put(admin.getId(), admin);
+    }
+
     // Get regular user by ID
     public RegularUser getRegularUserById(int id) {
         return regularUserMap.get(id);
@@ -45,36 +51,43 @@ public class UserRepository {
         return resourceManagerMap.get(id);
     }
 
-    // Get user by Email (searches both maps)
-    public User getUserByEmail(String email) {
-        User user = regularUserMap.values().stream()
-                .filter(u -> u.getEmail().equalsIgnoreCase(email))
-                .findFirst().orElse(null);
-
-        if (user == null) {
-            user = resourceManagerMap.values().stream()
-                    .filter(u -> u.getEmail().equalsIgnoreCase(email))
-                    .findFirst().orElse(null);
-        }
-
-        return user;
+    // Get admin by ID
+    public Admin getAdminById(int id) {
+        return adminMap.get(id);
     }
 
-    // Authenticate user (searches both maps)
-    public User authenticate(String email, String password) {
-        User user = regularUserMap.values().stream()
-                .filter(u -> u.getEmail().equalsIgnoreCase(email)
-                        && u.getPassword().equals(password))
-                .findFirst().orElse(null);
-
-        if (user == null) {
-            user = resourceManagerMap.values().stream()
-                    .filter(u -> u.getEmail().equalsIgnoreCase(email)
-                            && u.getPassword().equals(password))
-                    .findFirst().orElse(null);
+    // Get user by Email (searches all maps)
+    public User getUserByEmail(String email) {
+        for (User user : regularUserMap.values()) {
+            if (user.getEmail().equalsIgnoreCase(email))
+                return user;
         }
+        for (User user : resourceManagerMap.values()) {
+            if (user.getEmail().equalsIgnoreCase(email))
+                return user;
+        }
+        for (User user : adminMap.values()) {
+            if (user.getEmail().equalsIgnoreCase(email))
+                return user;
+        }
+        return null;
+    }
 
-        return user;
+    // Authenticate user
+    public User authenticate(String email, String password) {
+        for (User user : regularUserMap.values()) {
+            if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equals(password))
+                return user;
+        }
+        for (User user : resourceManagerMap.values()) {
+            if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equals(password))
+                return user;
+        }
+        for (User user : adminMap.values()) {
+            if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equals(password))
+                return user;
+        }
+        return null;
     }
 
     // Get all regular users
@@ -85,6 +98,11 @@ public class UserRepository {
     // Get all resource managers
     public List<ResourceManager> getAllResourceManagers() {
         return new ArrayList<>(resourceManagerMap.values());
+    }
+
+    // Get all admins
+    public List<Admin> getAllAdmins() {
+        return new ArrayList<>(adminMap.values());
     }
 
     // Update regular user
@@ -105,22 +123,47 @@ public class UserRepository {
         return false;
     }
 
-    // Delete regular user
-    public boolean deleteRegularUser(int id) {
-        return regularUserMap.remove(id) != null;
+    // Update admin
+    public boolean updateAdmin(int id, Admin updatedAdmin) {
+        if (adminMap.containsKey(id)) {
+            adminMap.put(id, updatedAdmin);
+            return true;
+        }
+        return false;
     }
 
-    // Delete resource manager
-    public boolean deleteResourceManager(int id) {
-        return resourceManagerMap.remove(id) != null;
+    // Delete regular user by email
+    public boolean deleteRegularUser(String email) {
+        User user = getUserByEmail(email);
+        if (user != null && user instanceof RegularUser) {
+            regularUserMap.remove(user.getId());
+            return true;
+        }
+        return false;
     }
 
-    // Check if email is already registered (searches both maps)
+    // Delete resource manager by email
+    public boolean deleteResourceManager(String email) {
+        User user = getUserByEmail(email);
+        if (user != null && user instanceof ResourceManager) {
+            resourceManagerMap.remove(user.getId());
+            return true;
+        }
+        return false;
+    }
+
+    // Delete admin by email
+    public boolean deleteAdmin(String email) {
+        User user = getUserByEmail(email);
+        if (user != null && user instanceof Admin) {
+            adminMap.remove(user.getId());
+            return true;
+        }
+        return false;
+    }
+
+    // Check if email is already taken
     public boolean isEmailTaken(String email) {
-        return regularUserMap.values().stream()
-                .anyMatch(user -> user.getEmail().equalsIgnoreCase(email)) ||
-                resourceManagerMap.values().stream()
-                .anyMatch(user -> user.getEmail().equalsIgnoreCase(email));
-
+        return getUserByEmail(email) != null;
     }
 }
