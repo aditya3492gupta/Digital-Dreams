@@ -2,13 +2,15 @@ package entity;
 
 public class Room {
     private String roomId;
-    private String type; 
+    private String type;
     private boolean isAvailable;
+    private double cost;
 
-    public Room(String roomId, String type, boolean isAvailable) {
+    public Room(String roomId, String type, boolean isAvailable, double cost) {
         this.roomId = roomId;
         this.type = type;
         this.isAvailable = isAvailable;
+        this.cost = cost;
     }
 
     public String getRoomId() {
@@ -35,12 +37,21 @@ public class Room {
         isAvailable = available;
     }
 
+    public double getCost() {
+        return cost;
+    }
+
+    public void setCost(double cost) {
+        this.cost = cost;
+    }
+
     @Override
     public String toString() {
         return "Room{" +
                 "roomId='" + roomId + '\'' +
                 ", type='" + type + '\'' +
                 ", isAvailable=" + isAvailable +
+                ", cost=₹" + cost +
                 '}';
     }
 }

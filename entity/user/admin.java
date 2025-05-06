@@ -3,12 +3,12 @@ package entity.user;
 import java.util.Objects;
 
 public class Admin extends User {
-
+    static String email = "admin@gmail.com";
     static int id = 123;
     static String password = "admin123";
 
     public Admin(int id, String name, String email, String password, int age) {
-        super(Admin.id, name, email, Admin.password, age);
+        super(Admin.id, name, Admin.email, Admin.password, age);
     }
 
     @Override

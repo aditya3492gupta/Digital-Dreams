@@ -22,12 +22,14 @@ public class RoomRepository {
         roomInventory.put("4AC", new ArrayList<>());
         roomInventory.put("4NAC", new ArrayList<>());
 
+
         int defaultQuantity = 5; 
+
         for (int i = 1; i <= defaultQuantity; i++) {
-            roomInventory.get("2AC").add(new Room("2AC" + i, "2AC", true));
-            roomInventory.get("2NAC").add(new Room("2NAC" + i, "2NAC", true));
-            roomInventory.get("4AC").add(new Room("4AC" + i, "4AC", true));
-            roomInventory.get("4NAC").add(new Room("4NAC" + i, "4NAC", true));
+            roomInventory.get("2AC").add(new Room("2AC" + i, "2AC", true, 1200.0));
+            roomInventory.get("2NAC").add(new Room("2NAC" + i, "2NAC", true, 800.0));
+            roomInventory.get("4AC").add(new Room("4AC" + i, "4AC", true, 1800.0));
+            roomInventory.get("4NAC").add(new Room("4NAC" + i, "4NAC", true, 1400.0));
         }
     }
 

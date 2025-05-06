@@ -1,7 +1,6 @@
 package repository;
 
 import entity.WellnessFacility;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +14,6 @@ public class WellnessFacilityRepository {
         initializeFacilities();
     }
 
-    // Initialize with default types and quantities
     private void initializeFacilities() {
         facilityInventory.put("Swimming Pool", new ArrayList<>());
         facilityInventory.put("Gym", new ArrayList<>());
@@ -23,8 +21,10 @@ public class WellnessFacilityRepository {
         int defaultQuantity = 3;
 
         for (int i = 1; i <= defaultQuantity; i++) {
-            facilityInventory.get("Swimming Pool").add(new WellnessFacility("SP" + i, "Swimming Pool", true));
-            facilityInventory.get("Gym").add(new WellnessFacility("GYM" + i, "Gym", true));
+            facilityInventory.get("Swimming Pool")
+                .add(new WellnessFacility("SP" + i, "Swimming Pool", true, 200.0));
+            facilityInventory.get("Gym")
+                .add(new WellnessFacility("GYM" + i, "Gym", true, 150.0));
         }
     }
 
