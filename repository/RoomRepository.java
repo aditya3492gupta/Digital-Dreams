@@ -15,14 +15,16 @@ public class RoomRepository {
         initializeRooms();
     }
 
-    // Predefined room types and quantities
+    
     private void initializeRooms() {
         roomInventory.put("2AC", new ArrayList<>());
         roomInventory.put("2NAC", new ArrayList<>());
         roomInventory.put("4AC", new ArrayList<>());
         roomInventory.put("4NAC", new ArrayList<>());
 
-        int defaultQuantity = 5;
+
+        int defaultQuantity = 5; 
+
         for (int i = 1; i <= defaultQuantity; i++) {
             roomInventory.get("2AC").add(new Room("2AC" + i, "2AC", true, 1200.0));
             roomInventory.get("2NAC").add(new Room("2NAC" + i, "2NAC", true, 800.0));
@@ -31,13 +33,12 @@ public class RoomRepository {
         }
     }
 
-    // Add a room to the inventory
     public boolean addRoom(Room room) {
         roomInventory.putIfAbsent(room.getType(), new ArrayList<>());
 
         for (Room r : roomInventory.get(room.getType())) {
             if (r.getRoomId().equalsIgnoreCase(room.getRoomId())) {
-                return false; // Duplicate
+                return false; 
             }
         }
 
