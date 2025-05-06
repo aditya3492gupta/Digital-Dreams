@@ -2,11 +2,10 @@ package controller;
 
 import entity.*;
 import entity.user.*;
-import repository.*;
-import service.*;
-
 import java.util.List;
 import java.util.Scanner;
+import repository.*;
+import service.*;
 
 public class MainController {
 
@@ -266,36 +265,48 @@ public class MainController {
     }
 
     private void wellnessFacilityMenu() {
-        System.out.println("\n--- Wellness Facility ---");
-        System.out.println("1. Register New Facility");
-        System.out.println("2. Book Facility");
-        System.out.println("3. Release Facility");
-        System.out.println("4. Show Available Facilities");
-        System.out.print("Choose an option: ");
-        int choice = Integer.parseInt(scanner.nextLine());
-
-        switch (choice) {
-            case 1 -> {
-                System.out.print("Facility ID: ");
-                String id = scanner.nextLine();
-                System.out.print("Type: ");
-                String type = scanner.nextLine();
-                wellnessFacilityService.registerNewFacility(id, type);
+        while (true) {
+            System.out.println("\n--- Wellness Facility ---");
+            System.out.println("1. Register New Facility");
+            System.out.println("2. Book Facility");
+            System.out.println("3. Release Facility");
+            System.out.println("4. Show Available Facilities");
+            System.out.println("5. Back to Previous Menu");
+            System.out.print("Choose an option: ");
+            int choice = Integer.parseInt(scanner.nextLine());
+    
+            switch (choice) {
+                case 1 -> {
+                    System.out.print("Facility ID: ");
+                    String id = scanner.nextLine();
+                    System.out.print("Type: ");
+                    String type = scanner.nextLine();
+                    System.out.print("Price per Hour: ");
+                    double price = Double.parseDouble(scanner.nextLine());
+                    wellnessFacilityService.registerNewFacility(id, type, price);
+                }
+                case 2 -> {
+                    System.out.print("Enter type to book: ");
+                    String type = scanner.nextLine();
+                    System.out.print("Enter number of hours: ");
+                    int hours = Integer.parseInt(scanner.nextLine());
+                    wellnessFacilityService.bookFacilityWithHours(type, hours);
+                }
+                case 3 -> {
+                    System.out.print("Enter facility ID to release: ");
+                    String id = scanner.nextLine();
+                    wellnessFacilityService.releaseFacility(id);
+                }
+                case 4 -> wellnessFacilityService.showAvailableFacilities();
+                case 5 -> {
+                    System.out.println("Returning to previous menu...");
+                    return;
+                }
+                default -> System.out.println("Invalid choice.");
             }
-            case 2 -> {
-                System.out.print("Enter type to book: ");
-                String type = scanner.nextLine();
-                wellnessFacilityService.bookFacility(type);
-            }
-            case 3 -> {
-                System.out.print("Enter facility ID to release: ");
-                String id = scanner.nextLine();
-                wellnessFacilityService.releaseFacility(id);
-            }
-            case 4 -> wellnessFacilityService.showAvailableFacilities();
-            default -> System.out.println("Invalid choice.");
         }
     }
+    
 
     private void transportationMenu() {
         System.out.println("\n--- Transportation ---");
