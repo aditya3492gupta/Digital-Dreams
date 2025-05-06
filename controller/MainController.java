@@ -345,21 +345,38 @@ public class MainController {
             case 1 -> {
                 System.out.print("Room ID: ");
                 String id = scanner.nextLine();
-                System.out.print("Type: ");
+                System.out.print("Type (2AC / 2NAC / 4AC / 4NAC): ");
                 String type = scanner.nextLine();
-                roomService.addRoom(id, type, true);
+                System.out.print("Cost (in ₹): ");
+                double cost = Double.parseDouble(scanner.nextLine());
+
+                boolean added = roomService.addRoom(id, type, true, cost);
+                if (added) {
+                    System.out.println("Room added successfully.");
+                } else {
+                    System.out.println("Room already exists.");
+                }
             }
             case 2 -> {
-                System.out.print("Room Type to book: ");
+                System.out.print("Room Type to book (2AC / 2NAC / 4AC / 4NAC): ");
                 String type = scanner.nextLine();
 
                 Room booked = roomService.bookRoom(type);
-                System.out.println(booked != null ? "Room booked: " + booked.getRoomId() : "No available room.");
+                if (booked != null) {
+                    System.out.println("Room booked: " + booked);
+                } else {
+                    System.out.println("No available room.");
+                }
             }
             case 3 -> {
                 System.out.print("Room ID to release: ");
                 String id = scanner.nextLine();
-                roomService.releaseRoom(id);
+                boolean released = roomService.releaseRoom(id);
+                if (released) {
+                    System.out.println("Room released successfully.");
+                } else {
+                    System.out.println("Failed to release room.");
+                }
             }
             case 4 -> roomService.showAvailableRooms();
             default -> System.out.println("Invalid choice.");

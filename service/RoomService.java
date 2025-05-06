@@ -12,8 +12,8 @@ public class RoomService {
         this.roomRepository = roomRepository;
     }
 
-    public boolean addRoom(String roomId, String type, boolean isAvailable) {
-        Room room = new Room(roomId, type, isAvailable);
+    public boolean addRoom(String roomId, String type, boolean isAvailable, double cost) {
+        Room room = new Room(roomId, type, isAvailable, cost);
         return roomRepository.addRoom(room);
     }
 
