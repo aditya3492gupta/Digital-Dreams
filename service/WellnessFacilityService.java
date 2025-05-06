@@ -1,5 +1,6 @@
 package service;
 
+import entity.BookingDetails;
 import entity.WellnessFacility;
 import repository.WellnessFacilityRepository;
 
@@ -12,8 +13,8 @@ public class WellnessFacilityService {
         this.repository = new WellnessFacilityRepository();
     }
 
-    public boolean registerNewFacility(String id, String type) {
-        WellnessFacility newFacility = new WellnessFacility(id, type, true);
+    public boolean registerNewFacility(String id, String type, double pricePerHour) {
+        WellnessFacility newFacility = new WellnessFacility(id, type, true, pricePerHour);
         boolean added = repository.addFacility(newFacility);
         if (added) {
             System.out.println("Successfully added facility: " + id);
@@ -23,7 +24,7 @@ public class WellnessFacilityService {
         return added;
     }
 
-    public WellnessFacility bookFacility(String type) {
+    public BookingDetails bookFacilityWithHours(String type, int hours) {
         List<WellnessFacility> availableFacilities = getAvailableFacilitiesByType(type);
 
         if (availableFacilities.isEmpty()) {
@@ -31,15 +32,15 @@ public class WellnessFacilityService {
             return null;
         }
 
-        // Book the first available one
         WellnessFacility facilityToBook = availableFacilities.get(0);
-        boolean success = !facilityToBook.isAvailable() ? false : repository.bookFacility(type) != null;
+        boolean success = repository.bookFacility(type) != null;
 
         if (success) {
-            System.out.println("Facility successfully booked: " + facilityToBook.getFacilityId());
-            return facilityToBook;
+            BookingDetails booking = new BookingDetails(facilityToBook, hours);
+            System.out.println("Facility successfully booked: " + booking);
+            return booking;
         } else {
-            System.out.println("Facility booking failed due to overlap or unavailability.");
+            System.out.println("Facility booking failed.");
             return null;
         }
     }

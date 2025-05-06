@@ -1,15 +1,16 @@
-//package Digital-Dreams.entity;
 package entity;
 
 public class WellnessFacility {
     private String facilityId;
     private String type; // Swimming Pool, Gym
     private boolean isAvailable;
+    private double pricePerHour; // 💰 Price per hour
 
-    public WellnessFacility(String facilityId, String type, boolean isAvailable) {
+    public WellnessFacility(String facilityId, String type, boolean isAvailable, double pricePerHour) {
         this.facilityId = facilityId;
         this.type = type;
         this.isAvailable = isAvailable;
+        this.pricePerHour = pricePerHour;
     }
 
     public String getFacilityId() {
@@ -34,5 +35,13 @@ public class WellnessFacility {
 
     public void setAvailable(boolean available) {
         isAvailable = available;
+    }
+
+    public double getPricePerHour() {
+        return pricePerHour;
+    }
+
+    public void setPricePerHour(double pricePerHour) {
+        this.pricePerHour = pricePerHour;
     }
 }
