@@ -1,13 +1,12 @@
 package repository;
 
-import entity.user.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import entity.user.Admin;
+import entity.user.RegularUser;
+import entity.user.ResourceManager;
+import entity.user.User;
+import java.util.*;
 
 public class UserRepository {
-
 
     private final Map<Integer, RegularUser> regularUserMap = new HashMap<>();
     private final Map<Integer, ResourceManager> resourceManagerMap = new HashMap<>();
@@ -19,28 +18,22 @@ public class UserRepository {
         Admin adminUser = new Admin(userIdCounter, "Admin", "admin@system.com", "admin123", 35);
         adminMap.put(adminUser.getId(), adminUser);
         userIdCounter++;
-
     }
 
-    // Remove a user by ID
-    public boolean removeUserById(int id) {
-        return users.removeIf(user -> user.getId() == id);
+    // Generate unique user ID
+    public int generateUserId() {
+        return userIdCounter++;
     }
 
-    // Find a user by ID
-    public Optional<User> findUserById(int id) {
-        return users.stream()
-                .filter(user -> user.getId() == id)
-                .findFirst();
+    // Add new regular user
+    public void addRegularUser(RegularUser user) {
+        regularUserMap.put(user.getId(), user);
     }
 
-    // Find a user by email
-    public Optional<User> findUserByEmail(String email) {
-        return users.stream()
-                .filter(user -> user.getEmail().equalsIgnoreCase(email))
-                .findFirst();
+    // Add new resource manager
+    public void addResourceManager(ResourceManager user) {
+        resourceManagerMap.put(user.getId(), user);
     }
-
 
     // Add new admin (if needed)
     public void addAdmin(Admin admin) {
@@ -50,14 +43,12 @@ public class UserRepository {
     // Get regular user by ID
     public RegularUser getRegularUserById(int id) {
         return regularUserMap.get(id);
-
     }
 
-    // List all users
-    public List<User> getAllUsers() {
-        return new ArrayList<>(users);
+    // Get resource manager by ID
+    public ResourceManager getResourceManagerById(int id) {
+        return resourceManagerMap.get(id);
     }
-
 
     // Get admin by ID
     public Admin getAdminById(int id) {
@@ -96,12 +87,10 @@ public class UserRepository {
                 return user;
         }
         return null;
-
     }
 
-    // List only RegularUsers
+    // Get all regular users
     public List<RegularUser> getAllRegularUsers() {
-
         return new ArrayList<>(regularUserMap.values());
     }
 
@@ -120,20 +109,16 @@ public class UserRepository {
         if (regularUserMap.containsKey(id)) {
             regularUserMap.put(id, updatedUser);
             return true;
-
         }
-        return regularUsers;
+        return false;
     }
 
-    // List all Admins
-    public List<Admin> getAllAdmins() {
-        List<Admin> admins = new ArrayList<>();
-        for (User user : users) {
-            if (user instanceof Admin) {
-                admins.add((Admin) user);
-            }
+    // Update resource manager
+    public boolean updateResourceManager(int id, ResourceManager updatedUser) {
+        if (resourceManagerMap.containsKey(id)) {
+            resourceManagerMap.put(id, updatedUser);
+            return true;
         }
-
         return false;
     }
 
@@ -179,6 +164,5 @@ public class UserRepository {
     // Check if email is already taken
     public boolean isEmailTaken(String email) {
         return getUserByEmail(email) != null;
-
     }
 }
