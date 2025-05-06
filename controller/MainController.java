@@ -243,7 +243,11 @@ public class MainController {
             System.out.println("2. View Available Vehicles");
             System.out.println("3. View Available Rooms");
             System.out.println("4. View Available Event Spaces");
-            System.out.println("5. Logout");
+            System.out.println("5. Book Rooms");
+            System.out.println("6. Book Event Space");
+            System.out.println("7. Book Wellness Facility");
+            System.out.println("8. Book Transportation");
+            System.out.println("9. Logout");
             System.out.print("Choose an option: ");
             int choice = Integer.parseInt(scanner.nextLine());
 
@@ -256,6 +260,38 @@ public class MainController {
                     availableSpaces.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
                 }
                 case 5 -> {
+                    System.out.print("Room Type to book (2AC / 2NAC / 4AC / 4NAC): ");
+                    String type = scanner.nextLine();
+
+                    Room booked = roomService.bookRoom(type);
+                    if (booked != null) {
+                        System.out.println("Room booked: " + booked);
+                    } else {
+                        System.out.println("No available room.");
+                    }
+                }
+                case 6 -> {
+                    List<EventSpace> allSpaces = eventSpaceService.getAllEventSpaces();
+                    allSpaces.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
+                    System.out.println();
+                    System.out.print("Type to book: ");
+                    String type = scanner.nextLine();
+                    eventSpaceService.bookEventSpaceByType(type);
+                }
+                case 7 -> {
+                    System.out.print("Enter type to book(Gym / Swimming Pool): ");
+                    String type = scanner.nextLine();
+                    System.out.print("Enter number of hours: ");
+                    int hours = Integer.parseInt(scanner.nextLine());
+                    wellnessFacilityService.bookFacilityWithHours(type, hours);
+                }
+                case 8 -> {
+                    transportationService.showAvailableVehicles();
+                    System.out.print("Type vehicle Id to book: ");
+                    String type = scanner.nextLine();
+                    transportationService.bookVehicle(type);
+                }
+                case 9 -> {
                     System.out.println("Logging out...");
                     return;
                 }
@@ -274,7 +310,7 @@ public class MainController {
             System.out.println("5. Back to Previous Menu");
             System.out.print("Choose an option: ");
             int choice = Integer.parseInt(scanner.nextLine());
-    
+
             switch (choice) {
                 case 1 -> {
                     System.out.print("Facility ID: ");
@@ -286,7 +322,7 @@ public class MainController {
                     wellnessFacilityService.registerNewFacility(id, type, price);
                 }
                 case 2 -> {
-                    System.out.print("Enter type to book: ");
+                    System.out.print("Enter type to book(Gym / Swimming Pool): ");
                     String type = scanner.nextLine();
                     System.out.print("Enter number of hours: ");
                     int hours = Integer.parseInt(scanner.nextLine());
@@ -306,7 +342,6 @@ public class MainController {
             }
         }
     }
-    
 
     private void transportationMenu() {
         System.out.println("\n--- Transportation ---");
@@ -394,27 +429,13 @@ public class MainController {
         }
     }
 
-    private void initializeStaticData() {
-        // Regular Users
-        userService.registerRegularUser("Amit Sharma", "amit", "amit", 28, "Delhi", "9876543210");
-        userService.registerRegularUser("Neha Verma", "neha", "neha", 25, "Mumbai", "9123456789");
-
-        // Resource Managers
-        userService.registerResourceManager("Rajiv Mehta", "rajiv", "rajiv", 35, "9988776655");
-        userService.registerResourceManager("Sonal Kapoor", "sonal", "sonal", 32, "8877665544");
-
-        transportationService.addVehicle("V101", "2-wheeler", 500.0, true);
-        transportationService.addVehicle("V102", "4-wheeler", 1000.0, true);
-        transportationService.addVehicle("V103", "2-wheeler", 500.0, true);
-        transportationService.addVehicle("V104", "4-wheeler", 1000.0, true);
-    }
-
     private void eventSpaceMenu() {
         System.out.println("\n--- Event Space ---");
         System.out.println("1. Add Event Space");
         System.out.println("2. Search Available Spaces");
         System.out.println("3. Delete Event Space");
-        System.out.println("4. View All Event Spaces");
+        System.out.println("4. Book Event Space");
+        System.out.println("5. View All Event Spaces");
         System.out.print("Choose an option: ");
         int choice = Integer.parseInt(scanner.nextLine());
 
@@ -440,8 +461,41 @@ public class MainController {
             case 4 -> {
                 List<EventSpace> allSpaces = eventSpaceService.getAllEventSpaces();
                 allSpaces.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
+                System.out.println();
+                System.out.print("Type to book: ");
+                String type = scanner.nextLine();
+                eventSpaceService.bookEventSpaceByType(type);
+            }
+            case 5 -> {
+                List<EventSpace> allSpaces = eventSpaceService.getAllEventSpaces();
+                allSpaces.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
             }
             default -> System.out.println("Invalid choice.");
         }
+
     }
+
+    private void initializeStaticData() {
+        // Regular Users
+        userService.registerRegularUser("Amit Sharma", "amit", "amit", 28, "Delhi", "9876543210");
+        userService.registerRegularUser("Neha Verma", "neha", "neha", 25, "Mumbai", "9123456789");
+
+        // Resource Managers
+        userService.registerResourceManager("Rajiv Mehta", "rajiv", "rajiv", 35, "9988776655");
+        userService.registerResourceManager("Sonal Kapoor", "sonal", "sonal", 32, "8877665544");
+
+        transportationService.addVehicle("V101", "2-wheeler", 500.0, true);
+        transportationService.addVehicle("V102", "4-wheeler", 1000.0, true);
+        transportationService.addVehicle("V103", "2-wheeler", 500.0, true);
+        transportationService.addVehicle("V104", "4-wheeler", 1000.0, true);
+
+        EventSpace gold = new GoldEventSpace("GOLD1", true);
+        EventSpace silver = new SilverEventSpace("SILVER1", true);
+        EventSpace platinum = new PlatinumEventSpace("PLATINUM1", true);
+
+        eventSpaceService.createEventSpace(gold);
+        eventSpaceService.createEventSpace(silver);
+        eventSpaceService.createEventSpace(platinum);
+    }
+
 }

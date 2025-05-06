@@ -22,9 +22,9 @@ public class WellnessFacilityRepository {
 
         for (int i = 1; i <= defaultQuantity; i++) {
             facilityInventory.get("Swimming Pool")
-                .add(new WellnessFacility("SP" + i, "Swimming Pool", true, 200.0));
+                    .add(new WellnessFacility("SP" + i, "Swimming Pool", true, 200.0));
             facilityInventory.get("Gym")
-                .add(new WellnessFacility("GYM" + i, "Gym", true, 150.0));
+                    .add(new WellnessFacility("GYM" + i, "Gym", true, 150.0));
         }
     }
 
