@@ -42,13 +42,14 @@ public class TransportationRepository {
     }
 
     // Method to book a vehicle by its ID (set its availability to false)
-    public boolean bookVehicle(String id) {
+    // Book a vehicle by its ID and return the cost if successful
+    public Double bookVehicle(String id) {
         Transportation vehicle = getVehicleById(id);
         if (vehicle != null && vehicle.isAvailable()) {
-            vehicle.setAvailable(false); // Set availability to false when booked
-            return true;
+            vehicle.setAvailable(false);
+            return vehicle.getCost();
         }
-        return false; // Return false if the vehicle is not available
+        return null; // Booking failed
     }
 
     // Method to release a vehicle by its ID (set its availability to true)
