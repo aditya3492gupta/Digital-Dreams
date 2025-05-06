@@ -14,15 +14,20 @@ public class TransportationService {
     }
 
     // Method to add a vehicle to the repository
-    public boolean addVehicle(String vehicleId, String vehicleType, boolean isAvailable) {
-        Transportation vehicle = new Transportation(vehicleId, vehicleType, isAvailable);
+    // Add a vehicle with cost and type
+    public boolean addVehicle(String vehicleId, String vehicleType, double cost, boolean isAvailable) {
+        Transportation vehicle = new Transportation(vehicleId, vehicleType, cost, isAvailable);
         return transportationRepository.addVehicle(vehicle);
     }
 
-    // Method to book a vehicle of a specific type
-    public boolean bookVehicle(String type) {
-        // Corrected to use the instance method
-        return transportationRepository.bookVehicle(type);
+    // Book a vehicle by ID and show cost
+    public void bookVehicle(String vehicleId) {
+        Double cost = transportationRepository.bookVehicle(vehicleId);
+        if (cost != null) {
+            System.out.println("Vehicle booked successfully! Cost: ₹" + cost);
+        } else {
+            System.out.println("Booking failed. Vehicle not found or already booked.");
+        }
     }
 
     // Method to release a vehicle based on its ID

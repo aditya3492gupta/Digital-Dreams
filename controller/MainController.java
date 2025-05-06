@@ -32,6 +32,7 @@ public class MainController {
 
         EventSpaceRepository eventSpaceRepository = new EventSpaceRepository();
         eventSpaceService = new EventSpaceService(eventSpaceRepository);
+        initializeStaticData();
     }
 
     public void start() {
@@ -311,15 +312,18 @@ public class MainController {
                 String id = scanner.nextLine();
                 System.out.print("Type: ");
                 String type = scanner.nextLine();
-                transportationService.addVehicle(id, type, true);
+                System.out.print("Cost: ");
+                double cost = Double.parseDouble(scanner.nextLine());
+                transportationService.addVehicle(id, type, cost, true);
             }
             case 2 -> {
-                System.out.print("Vehicle Type to book: ");
+                transportationService.showAvailableVehicles();
+                System.out.print("Type vehicle Id to book: ");
                 String type = scanner.nextLine();
                 transportationService.bookVehicle(type);
             }
             case 3 -> {
-                System.out.print("Vehicle ID to release: ");
+                System.out.print("Type vehicle ID to release: ");
                 String id = scanner.nextLine();
                 transportationService.releaseVehicle(id);
             }
@@ -348,6 +352,7 @@ public class MainController {
             case 2 -> {
                 System.out.print("Room Type to book: ");
                 String type = scanner.nextLine();
+
                 Room booked = roomService.bookRoom(type);
                 System.out.println(booked != null ? "Room booked: " + booked.getRoomId() : "No available room.");
             }
@@ -359,6 +364,21 @@ public class MainController {
             case 4 -> roomService.showAvailableRooms();
             default -> System.out.println("Invalid choice.");
         }
+    }
+
+    private void initializeStaticData() {
+        // Regular Users
+        userService.registerRegularUser("Amit Sharma", "amit", "amit", 28, "Delhi", "9876543210");
+        userService.registerRegularUser("Neha Verma", "neha", "neha", 25, "Mumbai", "9123456789");
+
+        // Resource Managers
+        userService.registerResourceManager("Rajiv Mehta", "rajiv", "rajiv", 35, "9988776655");
+        userService.registerResourceManager("Sonal Kapoor", "sonal", "sonal", 32, "8877665544");
+
+        transportationService.addVehicle("V101", "2-wheeler", 500.0, true);
+        transportationService.addVehicle("V102", "4-wheeler", 1000.0, true);
+        transportationService.addVehicle("V103", "2-wheeler", 500.0, true);
+        transportationService.addVehicle("V104", "4-wheeler", 1000.0, true);
     }
 
     private void eventSpaceMenu() {
