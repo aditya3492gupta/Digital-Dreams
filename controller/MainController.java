@@ -1,6 +1,8 @@
 package controller;
 
 import entity.*;
+import entity.cart.Cart;
+import entity.cart.CartItem;
 import entity.user.*;
 import java.util.List;
 import java.util.Scanner;
@@ -14,6 +16,8 @@ public class MainController {
     private final TransportationService transportationService;
     private final RoomService roomService;
     private final EventSpaceService eventSpaceService;
+    private final CartService cartService;
+    private String currentUserId = null;
 
     private final Scanner scanner = new Scanner(System.in);
 
@@ -31,6 +35,24 @@ public class MainController {
 
         EventSpaceRepository eventSpaceRepository = new EventSpaceRepository();
         eventSpaceService = new EventSpaceService(eventSpaceRepository);
+
+        CartRepository cartRepository = new CartRepository();
+
+        
+        WellnessFacilityRepository facilityRepository = new WellnessFacilityRepository();
+
+        
+        cartService = new CartService(
+            cartRepository, 
+            roomService, 
+            roomRepository, 
+            eventSpaceService, 
+            transportationService, 
+            wellnessFacilityService,
+            transportationRepository,
+            facilityRepository
+        );
+
         initializeStaticData();
     }
 
@@ -69,7 +91,9 @@ public class MainController {
         User user = userService.login(email, password);
         if (user instanceof Admin) {
             System.out.println("Admin logged in: " + user.getName());
+            currentUserId = user.getEmail(); // Set current user
             adminMenu();
+            currentUserId = null; // Reset current user on logout
         } else {
             System.out.println("Invalid admin credentials.");
         }
@@ -83,7 +107,9 @@ public class MainController {
         User user = userService.login(email, password);
         if (user instanceof RegularUser) {
             System.out.println("Regular User logged in: " + user.getName());
+            currentUserId = user.getEmail(); // Set current user
             userMenu();
+            currentUserId = null; // Reset current user on logout
         } else {
             System.out.println("Invalid credentials.");
         }
@@ -97,7 +123,9 @@ public class MainController {
         User user = userService.login(email, password);
         if (user instanceof ResourceManager) {
             System.out.println("Resource Manager logged in: " + user.getName());
+            currentUserId = user.getEmail(); // Set current user
             managerMenu();
+            currentUserId = null; // Reset current user on logout
         } else {
             System.out.println("Invalid credentials.");
         }
@@ -243,11 +271,13 @@ public class MainController {
             System.out.println("2. View Available Vehicles");
             System.out.println("3. View Available Rooms");
             System.out.println("4. View Available Event Spaces");
-            System.out.println("5. Book Rooms");
-            System.out.println("6. Book Event Space");
-            System.out.println("7. Book Wellness Facility");
-            System.out.println("8. Book Transportation");
-            System.out.println("9. Logout");
+            System.out.println("5. Add Room to Cart");
+            System.out.println("6. Add Event Space to Cart");
+            System.out.println("7. Add Wellness Facility to Cart");
+            System.out.println("8. Add Transportation to Cart");
+            System.out.println("9. View Cart");
+            System.out.println("10. Checkout");
+            System.out.println("11. Logout");
             System.out.print("Choose an option: ");
             int choice = Integer.parseInt(scanner.nextLine());
 
@@ -259,39 +289,13 @@ public class MainController {
                     List<EventSpace> availableSpaces = eventSpaceService.getAllEventSpaces();
                     availableSpaces.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
                 }
-                case 5 -> {
-                    System.out.print("Room Type to book (2AC / 2NAC / 4AC / 4NAC): ");
-                    String type = scanner.nextLine();
-
-                    Room booked = roomService.bookRoom(type);
-                    if (booked != null) {
-                        System.out.println("Room booked: " + booked);
-                    } else {
-                        System.out.println("No available room.");
-                    }
-                }
-                case 6 -> {
-                    List<EventSpace> allSpaces = eventSpaceService.getAllEventSpaces();
-                    allSpaces.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
-                    System.out.println();
-                    System.out.print("Type to book: ");
-                    String type = scanner.nextLine();
-                    eventSpaceService.bookEventSpaceByType(type);
-                }
-                case 7 -> {
-                    System.out.print("Enter type to book(Gym / Swimming Pool): ");
-                    String type = scanner.nextLine();
-                    System.out.print("Enter number of hours: ");
-                    int hours = Integer.parseInt(scanner.nextLine());
-                    wellnessFacilityService.bookFacilityWithHours(type, hours);
-                }
-                case 8 -> {
-                    transportationService.showAvailableVehicles();
-                    System.out.print("Type vehicle Id to book: ");
-                    String type = scanner.nextLine();
-                    transportationService.bookVehicle(type);
-                }
-                case 9 -> {
+                case 5 -> addRoomToCart();
+                case 6 -> addEventSpaceToCart();
+                case 7 -> addWellnessFacilityToCart();
+                case 8 -> addTransportationToCart();
+                case 9 -> viewCart();
+                case 10 -> checkoutCart();
+                case 11 -> {
                     System.out.println("Logging out...");
                     return;
                 }
@@ -299,6 +303,186 @@ public class MainController {
             }
         }
     }
+
+    // 5. Add methods for cart operations
+private void addRoomToCart() {
+    // Show available rooms
+    roomService.showAvailableRooms();
+    
+    System.out.print("Room ID to add to cart: ");
+    String roomId = scanner.nextLine();
+    
+    Room room = roomService.getRoomById(roomId);
+    if (room != null && room.isAvailable()) {
+        cartService.addRoomToCart(currentUserId, room.getRoomId(), room.getType(), room.getCost());
+        System.out.println("Room added to cart!");
+    } else {
+        System.out.println("Room not available or not found.");
+    }
+}
+
+private void addEventSpaceToCart() {
+    // Show available event spaces
+    List<EventSpace> availableSpaces = eventSpaceService.getAllEventSpaces();
+    System.out.println("\nAvailable Event Spaces:");
+    availableSpaces.stream()
+        .filter(EventSpace::isAvailable)
+        .forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
+    
+    System.out.print("Event Space ID to add to cart: ");
+    String spaceId = scanner.nextLine();
+    
+    EventSpace space = eventSpaceService.getEventSpaceById(spaceId);
+    if (space != null && space.isAvailable()) {
+        // Get appropriate cost based on type
+        double cost = 0.0;
+        if (space instanceof GoldEventSpace gold) {
+            cost = gold.getBookingCost();
+        } else if (space instanceof SilverEventSpace silver) {
+            cost = silver.getBookingCost();
+        } else if (space instanceof PlatinumEventSpace platinum) {
+            cost = platinum.getBookingCost();
+        }
+        
+        cartService.addEventSpaceToCart(currentUserId, space.getSpaceId(), space.getType(), cost);
+        System.out.println("Event Space added to cart!");
+    } else {
+        System.out.println("Event Space not available or not found.");
+    }
+}
+
+private void addWellnessFacilityToCart() {
+    // Show available facilities
+    wellnessFacilityService.showAvailableFacilities();
+    
+    System.out.print("Facility ID to add to cart: ");
+    String facilityId = scanner.nextLine();
+    
+    System.out.print("Number of hours: ");
+    int hours = Integer.parseInt(scanner.nextLine());
+    
+    // We need to assume WellnessFacility has a getFacilityById method
+    WellnessFacility facility = wellnessFacilityService.getFacilityById(facilityId);
+    if (facility != null && facility.isAvailable()) {
+        cartService.addWellnessFacilityToCart(
+            currentUserId, 
+            facility.getFacilityId(), 
+            facility.getType(),
+            hours, 
+            facility.getPricePerHour()
+        );
+        System.out.println("Wellness facility added to cart!");
+    } else {
+        System.out.println("Facility not available or not found.");
+    }
+}
+
+private void addTransportationToCart() {
+    // Show available vehicles
+    transportationService.showAvailableVehicles();
+    
+    System.out.print("Vehicle ID to add to cart: ");
+    String vehicleId = scanner.nextLine();
+    
+    // We need to assume TransportationService has a getVehicleById method
+    Transportation vehicle = transportationService.getVehicleById(vehicleId);
+    if (vehicle != null && vehicle.isAvailable()) {
+        cartService.addVehicleToCart(
+            currentUserId, 
+            vehicle.getVehicleId(), 
+            vehicle.getVehicleType(), 
+            vehicle.getCost()
+        );
+        System.out.println("Vehicle added to cart!");
+    } else {
+        System.out.println("Vehicle not available or not found.");
+    }
+}
+
+private void viewCart() {
+    if (currentUserId == null) {
+        System.out.println("No user is logged in.");
+        return;
+    }
+    
+    Cart cart = cartService.getCartForUser(currentUserId);
+    List<CartItem> items = cart.getItems();
+    
+    if (items.isEmpty()) {
+        System.out.println("Your cart is empty.");
+        return;
+    }
+    
+    System.out.println("\n--- Your Cart ---");
+    int index = 1;
+    for (CartItem item : items) {
+        System.out.println(index + ". " + item.getDescription() + " - ₹" + item.getCost());
+        index++;
+    }
+    
+    System.out.println("\nTotal: ₹" + cart.getTotalCost());
+    
+    System.out.println("\n1. Remove item from cart");
+    System.out.println("2. Clear cart");
+    System.out.println("3. Back to menu");
+    System.out.print("Choose an option: ");
+    
+    int choice = Integer.parseInt(scanner.nextLine());
+    switch (choice) {
+        case 1 -> {
+            System.out.print("Enter item number to remove: ");
+            int itemIndex = Integer.parseInt(scanner.nextLine()) - 1;
+            
+            if (itemIndex >= 0 && itemIndex < items.size()) {
+                CartItem itemToRemove = items.get(itemIndex);
+                cartService.removeItemFromCart(currentUserId, itemToRemove.getItemId());
+                System.out.println("Item removed from cart.");
+            } else {
+                System.out.println("Invalid item number.");
+            }
+        }
+        case 2 -> {
+            cartService.clearCart(currentUserId);
+            System.out.println("Cart cleared.");
+        }
+        case 3 -> {
+            System.out.println("Returning to menu...");
+            return;
+        }
+        default -> System.out.println("Invalid choice.");
+    }
+}
+
+private void checkoutCart() {
+    if (currentUserId == null) {
+        System.out.println("No user is logged in.");
+        return;
+    }
+    
+    Cart cart = cartService.getCartForUser(currentUserId);
+    
+    if (cart.getItems().isEmpty()) {
+        System.out.println("Your cart is empty.");
+        return;
+    }
+    
+    System.out.println("\n--- Checkout ---");
+    viewCart(); // Show the cart contents first
+    
+    System.out.print("\nProceed with checkout? (y/n): ");
+    String confirm = scanner.nextLine();
+    
+    if (confirm.equalsIgnoreCase("y")) {
+        boolean success = cartService.checkout(currentUserId);
+        if (success) {
+            System.out.println("Checkout successful! All items have been booked.");
+        } else {
+            System.out.println("Checkout failed. Some items may no longer be available.");
+        }
+    } else {
+        System.out.println("Checkout cancelled.");
+    }
+}
 
     private void wellnessFacilityMenu() {
         while (true) {
@@ -434,11 +618,13 @@ public class MainController {
         System.out.println("1. Add Event Space");
         System.out.println("2. Search Available Spaces");
         System.out.println("3. Delete Event Space");
-        System.out.println("4. Book Event Space");
-        System.out.println("5. View All Event Spaces");
+        System.out.println("4. Book Event Space by Type");
+        System.out.println("5. Book Event Space by ID");
+        System.out.println("6. Release Event Space");
+        System.out.println("7. View All Event Spaces");
         System.out.print("Choose an option: ");
         int choice = Integer.parseInt(scanner.nextLine());
-
+    
         switch (choice) {
             case 1 -> {
                 System.out.print("Space ID: ");
@@ -446,33 +632,74 @@ public class MainController {
                 System.out.print("Type: ");
                 String type = scanner.nextLine();
                 eventSpaceService.createEventSpace(new EventSpace(id, type, true));
+                System.out.println("Event space added successfully!");
             }
             case 2 -> {
                 System.out.print("Type: ");
                 String type = scanner.nextLine();
                 List<EventSpace> available = eventSpaceService.searchAvailableSpacesByType(type);
-                available.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
+                if (available.isEmpty()) {
+                    System.out.println("No available event spaces of type: " + type);
+                } else {
+                    System.out.println("Available " + type + " event spaces:");
+                    available.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType() + " - Available: " + e.isAvailable()));
+                }
             }
             case 3 -> {
                 System.out.print("Space ID to delete: ");
                 String id = scanner.nextLine();
-                eventSpaceService.deleteEventSpace(id);
+                boolean deleted = eventSpaceService.deleteEventSpace(id);
+                if (deleted) {
+                    System.out.println("Event space deleted successfully!");
+                } else {
+                    System.out.println("Failed to delete. Event space not found.");
+                }
             }
             case 4 -> {
-                List<EventSpace> allSpaces = eventSpaceService.getAllEventSpaces();
-                allSpaces.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
-                System.out.println();
                 System.out.print("Type to book: ");
                 String type = scanner.nextLine();
-                eventSpaceService.bookEventSpaceByType(type);
+                EventSpace booked = eventSpaceService.bookEventSpaceByType(type);
+                if (booked != null) {
+                    System.out.println("Event space booked successfully!");
+                }
             }
             case 5 -> {
+                // Display available spaces first
                 List<EventSpace> allSpaces = eventSpaceService.getAllEventSpaces();
-                allSpaces.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
+                System.out.println("\nAll Event Spaces:");
+                allSpaces.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType() + " - Available: " + e.isAvailable()));
+                
+                System.out.print("\nSpace ID to book: ");
+                String id = scanner.nextLine();
+                EventSpace booked = eventSpaceService.bookEventSpace(id);
+                if (booked != null) {
+                    System.out.println("Event space booked successfully!");
+                }
+            }
+            case 6 -> {
+                // Display all spaces first
+                List<EventSpace> allSpaces = eventSpaceService.getAllEventSpaces();
+                System.out.println("\nAll Event Spaces:");
+                allSpaces.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType() + " - Available: " + e.isAvailable()));
+                
+                System.out.print("\nSpace ID to release: ");
+                String id = scanner.nextLine();
+                boolean released = eventSpaceService.releaseEventSpace(id);
+                if (released) {
+                    System.out.println("Event space released successfully!");
+                }
+            }
+            case 7 -> {
+                List<EventSpace> allSpaces = eventSpaceService.getAllEventSpaces();
+                if (allSpaces.isEmpty()) {
+                    System.out.println("No event spaces available in the system.");
+                } else {
+                    System.out.println("\nAll Event Spaces:");
+                    allSpaces.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType() + " - Available: " + e.isAvailable()));
+                }
             }
             default -> System.out.println("Invalid choice.");
         }
-
     }
 
     private void initializeStaticData() {
@@ -489,13 +716,17 @@ public class MainController {
         transportationService.addVehicle("V103", "2-wheeler", 500.0, true);
         transportationService.addVehicle("V104", "4-wheeler", 1000.0, true);
 
-        EventSpace gold = new GoldEventSpace("GOLD1", true);
-        EventSpace silver = new SilverEventSpace("SILVER1", true);
-        EventSpace platinum = new PlatinumEventSpace("PLATINUM1", true);
+        EventSpace gold = new GoldEventSpace("Gold", true);
+        EventSpace silver = new SilverEventSpace("Silver", true);
+        EventSpace platinum = new PlatinumEventSpace("Platinum", true);
 
         eventSpaceService.createEventSpace(gold);
         eventSpaceService.createEventSpace(silver);
         eventSpaceService.createEventSpace(platinum);
-    }
+
+        wellnessFacilityService.registerNewFacility("SP1", "Swimming Pool", 200.0);
+        wellnessFacilityService.registerNewFacility("SP2", "Swimming Pool", 200.0);
+        wellnessFacilityService.registerNewFacility("GYM1", "Gym", 150.0);
+        wellnessFacilityService.registerNewFacility("GYM2", "Gym", 150.0);}
 
 }
