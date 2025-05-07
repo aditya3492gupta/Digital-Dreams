@@ -31,7 +31,7 @@ public class CartRepository {
                                         .map(item -> item.getItemId())
                                         .collect(Collectors.toList());
             // Save cart history
-            CartHistory cartHistory = new CartHistory(userId, itemIds);
+            CartHistory cartHistory = new CartHistory(cart);
             cartHistoryMap.put(userId, cartHistory);
         }
         userCarts.remove(userId);
