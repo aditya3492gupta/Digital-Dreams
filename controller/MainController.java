@@ -7,12 +7,6 @@ import entity.user.*;
 import java.util.List;
 import java.util.Scanner;
 
-import entity.EventSpace;
-import entity.GoldEventSpace;
-import entity.PlatinumEventSpace;
-import entity.Room;
-import entity.SilverEventSpace;
-
 import entity.user.Admin;
 import entity.user.RegularUser;
 import entity.user.ResourceManager;
@@ -171,7 +165,7 @@ public class MainController {
             System.out.println("Password too weak.");
             return;
         }
-        int age = v.getIntInput("Age: ");
+        int age = v.getPositiveIntInput("Age: ");
         String address = v.getStringInput("Address: ");
         String phone = v.getStringInput("Phone: ");
         if (!Validation.isValidPhoneNumber(phone)) {
@@ -195,7 +189,7 @@ public class MainController {
             System.out.println("Password too weak.");
             return;
         }
-        int age = v.getIntInput("Age: ");
+        int age = v.getPositiveIntInput("Age: ");
         String phone = v.getStringInput("Phone: ");
         if (!Validation.isValidPhoneNumber(phone)) {
             System.out.println("Enter correct phn no");
