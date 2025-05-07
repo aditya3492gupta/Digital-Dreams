@@ -18,8 +18,21 @@
 ```
 Digital-Dreams-main
 ├── controller
+│   ├── Main.java
 │   └── MainController.java
 ├── entity
+│   ├── user
+    │   ├── Admin.java
+    │   ├── RegularUser.java
+    │   ├── RegularManager.java
+    │   └── User.java
+│   ├── cart
+    │   ├── Cart.java
+    │   ├── CartHistory.java
+    │   ├── CartItem.java
+    │   ├── RoomCartItem.java
+    │   ├── EventCartItem.java
+    │   └── WellnessFacilityCartItem.java
 │   ├── EventSpace.java
 │   ├── GoldEventSpace.java
 │   ├── PlatinumEventSpace.java
@@ -27,8 +40,24 @@ Digital-Dreams-main
 │   ├── SilverEventSpace.java
 │   ├── Transportation.java
 │   └── WellnessFacility.java
+└── repository
+│   ├── CartRepository.java
+│   ├── EventSpaceRepository.java
+│   ├── RoomRepository.java
+│   ├── TransportationRepository.java
+│   ├── UserRepository.java
+│   └── WellnessFacilityRepository.java
 └── service
-    └── (Service classes for each entity)
+│   ├── CartHistoryDisplayService.java
+│   ├── CartHistoryService.java
+│   ├── CartService.java
+│   ├── EventSpaceService.java
+│   ├── RoomService.java
+│   ├── TransportationService.java
+│   ├── UserService.java
+│   └── WellnessFacilityService.java
+└── utility
+│   └── Validation.java
 ```
 
 ## Setup Instructions
