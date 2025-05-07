@@ -7,11 +7,6 @@ import entity.user.*;
 import java.util.List;
 import java.util.Scanner;
 
-import entity.EventSpace;
-import entity.GoldEventSpace;
-import entity.PlatinumEventSpace;
-import entity.Room;
-import entity.SilverEventSpace;
 import entity.user.Admin;
 import entity.user.RegularUser;
 import entity.user.ResourceManager;
@@ -161,10 +156,22 @@ public class MainController {
     private void registerRegularUser() {
         String name = v.getStringInput("Name: ");
         String email = v.getStringInput("Email: ");
+         if (!Validation.isValidEmail(email)) {
+        System.out.println("Invalid email format.");
+        return;
+        }
         String password = v.getStringInput("Password: ");
+        if (!Validation.isValidPassword(password)) {
+            System.out.println("Password too weak.");
+            return;
+        }
         int age = v.getIntInput("Age: ");
         String address = v.getStringInput("Address: ");
         String phone = v.getStringInput("Phone: ");
+        if (!Validation.isValidPhoneNumber(phone)) {
+            System.out.println("Enter correct phn no");
+            return;
+        }
 
         boolean success = userService.registerRegularUser(name, email, password, age, address, phone);
         System.out.println(success ? "User registered." : "Email already taken.");
@@ -173,9 +180,21 @@ public class MainController {
     private void registerResourceManager() {
         String name = v.getStringInput("Name: ");
         String email = v.getStringInput("Email: ");
+        if (!Validation.isValidEmail(email)) {
+            System.out.println("Invalid email format.");
+            return;
+        }
         String password = v.getStringInput("Password: ");
+        if (!Validation.isValidPassword(password)) {
+            System.out.println("Password too weak.");
+            return;
+        }
         int age = v.getIntInput("Age: ");
         String phone = v.getStringInput("Phone: ");
+        if (!Validation.isValidPhoneNumber(phone)) {
+            System.out.println("Enter correct phn no");
+            return;
+        }
 
         boolean success = userService.registerResourceManager(name, email, password, age, phone);
         System.out.println(success ? "Manager registered." : "Email already taken.");
@@ -281,6 +300,10 @@ public class MainController {
         String name = scanner.nextLine();
         System.out.print("New Password: ");
         String password = scanner.nextLine();
+        if (!Validation.isValidPassword(password)) {
+            System.out.println("Password too weak.");
+            return;
+        }
 
         boolean updated = userService.updateUserProfile(loggedInUserEmail, name, password);
         System.out.println(updated ? "Profile updated successfully." : "Profile update failed.");
