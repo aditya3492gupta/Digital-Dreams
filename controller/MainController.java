@@ -1,6 +1,5 @@
 package controller;
 
-
 import entity.*;
 import entity.cart.Cart;
 import entity.cart.CartItem;
@@ -21,8 +20,11 @@ import repository.EventSpaceRepository;
 import repository.RoomRepository;
 import repository.TransportationRepository;
 import repository.UserRepository;
+import repository.CartRepository;
+import repository.WellnessFacilityRepository;
 import service.EventSpaceService;
 import service.RoomService;
+import service.CartService;
 import service.TransportationService;
 import service.UserService;
 import service.WellnessFacilityService;
@@ -40,7 +42,6 @@ public class MainController {
     private String currentUserId = null;
 
     private String loggedInUserEmail;
-
 
     private final Scanner scanner = new Scanner(System.in);
 
@@ -61,26 +62,23 @@ public class MainController {
 
         CartRepository cartRepository = new CartRepository();
 
-        
         WellnessFacilityRepository facilityRepository = new WellnessFacilityRepository();
 
-        
         cartService = new CartService(
-            cartRepository, 
-            roomService, 
-            roomRepository, 
-            eventSpaceService, 
-            transportationService, 
-            wellnessFacilityService,
-            transportationRepository,
-            facilityRepository
-        );
+                cartRepository,
+                roomService,
+                roomRepository,
+                eventSpaceService,
+                transportationService,
+                wellnessFacilityService,
+                transportationRepository,
+                facilityRepository);
 
         initializeStaticData();
     }
- 
 
     Validation v = new Validation();
+
     public void start() {
         while (true) {
             System.out.println("\n===== Welcome to Resource Management System =====");
@@ -140,7 +138,8 @@ public class MainController {
             System.out.println("Invalid credentials.");
         }
     }
-//Comments
+
+    // Comments
     private void resourceManagerLogin() {
         String email = v.getStringInput("Email: ");
         String password = v.getStringInput("Password: ");
@@ -191,14 +190,10 @@ public class MainController {
             System.out.println("4. Delete Regular User");
             System.out.println("5. Delete Resource Manager");
 
-          
-
             // System.out.println("6. Update User Profile");
             System.out.println("6. View Available Resources");
             System.out.println("7. Logout");
-             int choice = v.getIntInput("Choose an option: ");
-            
-
+            int choice = v.getIntInput("Choose an option: ");
 
             switch (choice) {
                 case 1 -> {
@@ -229,7 +224,6 @@ public class MainController {
                     }
                 }
 
-               
                 case 6 -> {
 
                     System.out.println("Wellness Facilities:");
@@ -262,9 +256,8 @@ public class MainController {
 
             System.out.println("5. Update Manager Profile");
             System.out.println("6. Logout");
-           
-          int choice = v.getIntInput("Choose an option: ");
 
+            int choice = v.getIntInput("Choose an option: ");
 
             switch (choice) {
                 case 1 -> wellnessFacilityMenu();
@@ -313,10 +306,8 @@ public class MainController {
             System.out.println("10. Checkout");
             System.out.println("11. Update User Profile");
             System.out.println("12. Logout");
-           
+
             int choice = v.getIntInput("Choose an option: ");
-
-
 
             switch (choice) {
                 case 1 -> wellnessFacilityService.showAvailableFacilities();
@@ -344,184 +335,182 @@ public class MainController {
     }
 
     // 5. Add methods for cart operations
-private void addRoomToCart() {
-    // Show available rooms
-    roomService.showAvailableRooms();
-    
-    System.out.print("Room ID to add to cart: ");
-    String roomId = scanner.nextLine();
-    
-    Room room = roomService.getRoomById(roomId);
-    if (room != null && room.isAvailable()) {
-        cartService.addRoomToCart(currentUserId, room.getRoomId(), room.getType(), room.getCost());
-        System.out.println("Room added to cart!");
-    } else {
-        System.out.println("Room not available or not found.");
-    }
-}
+    private void addRoomToCart() {
+        // Show available rooms
+        roomService.showAvailableRooms();
 
-private void addEventSpaceToCart() {
-    // Show available event spaces
-    List<EventSpace> availableSpaces = eventSpaceService.getAllEventSpaces();
-    System.out.println("\nAvailable Event Spaces:");
-    availableSpaces.stream()
-        .filter(EventSpace::isAvailable)
-        .forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
-    
-    System.out.print("Event Space ID to add to cart: ");
-    String spaceId = scanner.nextLine();
-    
-    EventSpace space = eventSpaceService.getEventSpaceById(spaceId);
-    if (space != null && space.isAvailable()) {
-        // Get appropriate cost based on type
-        double cost = 0.0;
-        if (space instanceof GoldEventSpace gold) {
-            cost = gold.getBookingCost();
-        } else if (space instanceof SilverEventSpace silver) {
-            cost = silver.getBookingCost();
-        } else if (space instanceof PlatinumEventSpace platinum) {
-            cost = platinum.getBookingCost();
+        System.out.print("Room ID to add to cart: ");
+        String roomId = scanner.nextLine();
+
+        Room room = roomService.getRoomById(roomId);
+        if (room != null && room.isAvailable()) {
+            cartService.addRoomToCart(currentUserId, room.getRoomId(), room.getType(), room.getCost());
+            System.out.println("Room added to cart!");
+        } else {
+            System.out.println("Room not available or not found.");
         }
-        
-        cartService.addEventSpaceToCart(currentUserId, space.getSpaceId(), space.getType(), cost);
-        System.out.println("Event Space added to cart!");
-    } else {
-        System.out.println("Event Space not available or not found.");
     }
-}
 
-private void addWellnessFacilityToCart() {
-    // Show available facilities
-    wellnessFacilityService.showAvailableFacilities();
-    
-    System.out.print("Facility ID to add to cart: ");
-    String facilityId = scanner.nextLine();
-    
-    System.out.print("Number of hours: ");
-    int hours = Integer.parseInt(scanner.nextLine());
-    
-    // We need to assume WellnessFacility has a getFacilityById method
-    WellnessFacility facility = wellnessFacilityService.getFacilityById(facilityId);
-    if (facility != null && facility.isAvailable()) {
-        cartService.addWellnessFacilityToCart(
-            currentUserId, 
-            facility.getFacilityId(), 
-            facility.getType(),
-            hours, 
-            facility.getPricePerHour()
-        );
-        System.out.println("Wellness facility added to cart!");
-    } else {
-        System.out.println("Facility not available or not found.");
-    }
-}
+    private void addEventSpaceToCart() {
+        // Show available event spaces
+        List<EventSpace> availableSpaces = eventSpaceService.getAllEventSpaces();
+        System.out.println("\nAvailable Event Spaces:");
+        availableSpaces.stream()
+                .filter(EventSpace::isAvailable)
+                .forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
 
-private void addTransportationToCart() {
-    // Show available vehicles
-    transportationService.showAvailableVehicles();
-    
-    System.out.print("Vehicle ID to add to cart: ");
-    String vehicleId = scanner.nextLine();
-    
-    // We need to assume TransportationService has a getVehicleById method
-    Transportation vehicle = transportationService.getVehicleById(vehicleId);
-    if (vehicle != null && vehicle.isAvailable()) {
-        cartService.addVehicleToCart(
-            currentUserId, 
-            vehicle.getVehicleId(), 
-            vehicle.getVehicleType(), 
-            vehicle.getCost()
-        );
-        System.out.println("Vehicle added to cart!");
-    } else {
-        System.out.println("Vehicle not available or not found.");
-    }
-}
+        System.out.print("Event Space ID to add to cart: ");
+        String spaceId = scanner.nextLine();
 
-private void viewCart() {
-    if (currentUserId == null) {
-        System.out.println("No user is logged in.");
-        return;
-    }
-    
-    Cart cart = cartService.getCartForUser(currentUserId);
-    List<CartItem> items = cart.getItems();
-    
-    if (items.isEmpty()) {
-        System.out.println("Your cart is empty.");
-        return;
-    }
-    
-    System.out.println("\n--- Your Cart ---");
-    int index = 1;
-    for (CartItem item : items) {
-        System.out.println(index + ". " + item.getDescription() + " - ₹" + item.getCost());
-        index++;
-    }
-    
-    System.out.println("\nTotal: ₹" + cart.getTotalCost());
-    
-    System.out.println("\n1. Remove item from cart");
-    System.out.println("2. Clear cart");
-    System.out.println("3. Back to menu");
-    System.out.print("Choose an option: ");
-    
-    int choice = Integer.parseInt(scanner.nextLine());
-    switch (choice) {
-        case 1 -> {
-            System.out.print("Enter item number to remove: ");
-            int itemIndex = Integer.parseInt(scanner.nextLine()) - 1;
-            
-            if (itemIndex >= 0 && itemIndex < items.size()) {
-                CartItem itemToRemove = items.get(itemIndex);
-                cartService.removeItemFromCart(currentUserId, itemToRemove.getItemId());
-                System.out.println("Item removed from cart.");
-            } else {
-                System.out.println("Invalid item number.");
+        EventSpace space = eventSpaceService.getEventSpaceById(spaceId);
+        if (space != null && space.isAvailable()) {
+            // Get appropriate cost based on type
+            double cost = 0.0;
+            if (space instanceof GoldEventSpace gold) {
+                cost = gold.getBookingCost();
+            } else if (space instanceof SilverEventSpace silver) {
+                cost = silver.getBookingCost();
+            } else if (space instanceof PlatinumEventSpace platinum) {
+                cost = platinum.getBookingCost();
             }
+
+            cartService.addEventSpaceToCart(currentUserId, space.getSpaceId(), space.getType(), cost);
+            System.out.println("Event Space added to cart!");
+        } else {
+            System.out.println("Event Space not available or not found.");
         }
-        case 2 -> {
-            cartService.clearCart(currentUserId);
-            System.out.println("Cart cleared.");
+    }
+
+    private void addWellnessFacilityToCart() {
+        // Show available facilities
+        wellnessFacilityService.showAvailableFacilities();
+
+        System.out.print("Facility ID to add to cart: ");
+        String facilityId = scanner.nextLine();
+
+        System.out.print("Number of hours: ");
+        int hours = Integer.parseInt(scanner.nextLine());
+
+        // We need to assume WellnessFacility has a getFacilityById method
+        WellnessFacility facility = wellnessFacilityService.getFacilityById(facilityId);
+        if (facility != null && facility.isAvailable()) {
+            cartService.addWellnessFacilityToCart(
+                    currentUserId,
+                    facility.getFacilityId(),
+                    facility.getType(),
+                    hours,
+                    facility.getPricePerHour());
+            System.out.println("Wellness facility added to cart!");
+        } else {
+            System.out.println("Facility not available or not found.");
         }
-        case 3 -> {
-            System.out.println("Returning to menu...");
+    }
+
+    private void addTransportationToCart() {
+        // Show available vehicles
+        transportationService.showAvailableVehicles();
+
+        System.out.print("Vehicle ID to add to cart: ");
+        String vehicleId = scanner.nextLine();
+
+        // We need to assume TransportationService has a getVehicleById method
+        Transportation vehicle = transportationService.getVehicleById(vehicleId);
+        if (vehicle != null && vehicle.isAvailable()) {
+            cartService.addVehicleToCart(
+                    currentUserId,
+                    vehicle.getVehicleId(),
+                    vehicle.getVehicleType(),
+                    vehicle.getCost());
+            System.out.println("Vehicle added to cart!");
+        } else {
+            System.out.println("Vehicle not available or not found.");
+        }
+    }
+
+    private void viewCart() {
+        if (currentUserId == null) {
+            System.out.println("No user is logged in.");
             return;
         }
-        default -> System.out.println("Invalid choice.");
-    }
-}
 
-private void checkoutCart() {
-    if (currentUserId == null) {
-        System.out.println("No user is logged in.");
-        return;
-    }
-    
-    Cart cart = cartService.getCartForUser(currentUserId);
-    
-    if (cart.getItems().isEmpty()) {
-        System.out.println("Your cart is empty.");
-        return;
-    }
-    
-    System.out.println("\n--- Checkout ---");
-    viewCart(); // Show the cart contents first
-    
-    System.out.print("\nProceed with checkout? (y/n): ");
-    String confirm = scanner.nextLine();
-    
-    if (confirm.equalsIgnoreCase("y")) {
-        boolean success = cartService.checkout(currentUserId);
-        if (success) {
-            System.out.println("Checkout successful! All items have been booked.");
-        } else {
-            System.out.println("Checkout failed. Some items may no longer be available.");
+        Cart cart = cartService.getCartForUser(currentUserId);
+        List<CartItem> items = cart.getItems();
+
+        if (items.isEmpty()) {
+            System.out.println("Your cart is empty.");
+            return;
         }
-    } else {
-        System.out.println("Checkout cancelled.");
+
+        System.out.println("\n--- Your Cart ---");
+        int index = 1;
+        for (CartItem item : items) {
+            System.out.println(index + ". " + item.getDescription() + " - ₹" + item.getCost());
+            index++;
+        }
+
+        System.out.println("\nTotal: ₹" + cart.getTotalCost());
+
+        System.out.println("\n1. Remove item from cart");
+        System.out.println("2. Clear cart");
+        System.out.println("3. Back to menu");
+        System.out.print("Choose an option: ");
+
+        int choice = Integer.parseInt(scanner.nextLine());
+        switch (choice) {
+            case 1 -> {
+                System.out.print("Enter item number to remove: ");
+                int itemIndex = Integer.parseInt(scanner.nextLine()) - 1;
+
+                if (itemIndex >= 0 && itemIndex < items.size()) {
+                    CartItem itemToRemove = items.get(itemIndex);
+                    cartService.removeItemFromCart(currentUserId, itemToRemove.getItemId());
+                    System.out.println("Item removed from cart.");
+                } else {
+                    System.out.println("Invalid item number.");
+                }
+            }
+            case 2 -> {
+                cartService.clearCart(currentUserId);
+                System.out.println("Cart cleared.");
+            }
+            case 3 -> {
+                System.out.println("Returning to menu...");
+                return;
+            }
+            default -> System.out.println("Invalid choice.");
+        }
     }
-}
+
+    private void checkoutCart() {
+        if (currentUserId == null) {
+            System.out.println("No user is logged in.");
+            return;
+        }
+
+        Cart cart = cartService.getCartForUser(currentUserId);
+
+        if (cart.getItems().isEmpty()) {
+            System.out.println("Your cart is empty.");
+            return;
+        }
+
+        System.out.println("\n--- Checkout ---");
+        viewCart(); // Show the cart contents first
+
+        System.out.print("\nProceed with checkout? (y/n): ");
+        String confirm = scanner.nextLine();
+
+        if (confirm.equalsIgnoreCase("y")) {
+            boolean success = cartService.checkout(currentUserId);
+            if (success) {
+                System.out.println("Checkout successful! All items have been booked.");
+            } else {
+                System.out.println("Checkout failed. Some items may no longer be available.");
+            }
+        } else {
+            System.out.println("Checkout cancelled.");
+        }
+    }
 
     private void wellnessFacilityMenu() {
         while (true) {
@@ -536,7 +525,8 @@ private void checkoutCart() {
             switch (choice) {
                 case 1 -> {
                     String id = v.getStringInput("Facility ID: ");
-                    String type = v.getStringInput("Type: ");                    double price = v.getDoubleInput("Price per Hour: ");
+                    String type = v.getStringInput("Type: ");
+                    double price = v.getDoubleInput("Price per Hour: ");
                     wellnessFacilityService.registerNewFacility(id, type, price);
                 }
                 case 2 -> {
@@ -658,7 +648,8 @@ private void checkoutCart() {
                     System.out.println("No available event spaces of type: " + type);
                 } else {
                     System.out.println("Available " + type + " event spaces:");
-                    available.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType() + " - Available: " + e.isAvailable()));
+                    available.forEach(e -> System.out
+                            .println(e.getSpaceId() + " - " + e.getType() + " - Available: " + e.isAvailable()));
                 }
             }
             case 3 -> {
@@ -677,14 +668,15 @@ private void checkoutCart() {
                 if (booked != null) {
                     System.out.println("Event space booked successfully!");
                 }
-                eventSpaceService.deleteEventSpace(id);
+
             }
             case 5 -> {
                 // Display available spaces first
                 List<EventSpace> allSpaces = eventSpaceService.getAllEventSpaces();
                 System.out.println("\nAll Event Spaces:");
-                allSpaces.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType() + " - Available: " + e.isAvailable()));
-                
+                allSpaces.forEach(e -> System.out
+                        .println(e.getSpaceId() + " - " + e.getType() + " - Available: " + e.isAvailable()));
+
                 System.out.print("\nSpace ID to book: ");
                 String id = scanner.nextLine();
                 EventSpace booked = eventSpaceService.bookEventSpace(id);
@@ -696,8 +688,9 @@ private void checkoutCart() {
                 // Display all spaces first
                 List<EventSpace> allSpaces = eventSpaceService.getAllEventSpaces();
                 System.out.println("\nAll Event Spaces:");
-                allSpaces.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType() + " - Available: " + e.isAvailable()));
-                
+                allSpaces.forEach(e -> System.out
+                        .println(e.getSpaceId() + " - " + e.getType() + " - Available: " + e.isAvailable()));
+
                 System.out.print("\nSpace ID to release: ");
                 String id = scanner.nextLine();
                 boolean released = eventSpaceService.releaseEventSpace(id);
@@ -711,7 +704,8 @@ private void checkoutCart() {
                     System.out.println("No event spaces available in the system.");
                 } else {
                     System.out.println("\nAll Event Spaces:");
-                    allSpaces.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType() + " - Available: " + e.isAvailable()));
+                    allSpaces.forEach(e -> System.out
+                            .println(e.getSpaceId() + " - " + e.getType() + " - Available: " + e.isAvailable()));
                 }
             }
             default -> System.out.println("Invalid choice.");
@@ -743,6 +737,7 @@ private void checkoutCart() {
         wellnessFacilityService.registerNewFacility("SP1", "Swimming Pool", 200.0);
         wellnessFacilityService.registerNewFacility("SP2", "Swimming Pool", 200.0);
         wellnessFacilityService.registerNewFacility("GYM1", "Gym", 150.0);
-        wellnessFacilityService.registerNewFacility("GYM2", "Gym", 150.0);}
+        wellnessFacilityService.registerNewFacility("GYM2", "Gym", 150.0);
+    }
 
 }
