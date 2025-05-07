@@ -14,6 +14,7 @@ public class MainController {
     private final TransportationService transportationService;
     private final RoomService roomService;
     private final EventSpaceService eventSpaceService;
+    private String loggedInUserEmail;
 
     private final Scanner scanner = new Scanner(System.in);
 
@@ -80,9 +81,11 @@ public class MainController {
         String email = scanner.nextLine();
         System.out.print("Password: ");
         String password = scanner.nextLine();
+
         User user = userService.login(email, password);
         if (user instanceof RegularUser) {
             System.out.println("Regular User logged in: " + user.getName());
+            setLoggedInUserEmail(email);
             userMenu();
         } else {
             System.out.println("Invalid credentials.");
@@ -97,6 +100,7 @@ public class MainController {
         User user = userService.login(email, password);
         if (user instanceof ResourceManager) {
             System.out.println("Resource Manager logged in: " + user.getName());
+            setLoggedInUserEmail(email);
             managerMenu();
         } else {
             System.out.println("Invalid credentials.");
@@ -146,9 +150,9 @@ public class MainController {
             System.out.println("3. Add Resource Manager");
             System.out.println("4. Delete Regular User");
             System.out.println("5. Delete Resource Manager");
-            System.out.println("6. Update User Profile");
-            System.out.println("7. View Available Resources");
-            System.out.println("8. Logout");
+            // System.out.println("6. Update User Profile");
+            System.out.println("6. View Available Resources");
+            System.out.println("7. Logout");
             System.out.print("Choose an option: ");
             int choice = Integer.parseInt(scanner.nextLine());
 
@@ -181,17 +185,8 @@ public class MainController {
                         System.out.println("Manager not found.");
                     }
                 }
+
                 case 6 -> {
-                    System.out.print("Enter email to update: ");
-                    String email = scanner.nextLine();
-                    System.out.print("New Name: ");
-                    String name = scanner.nextLine();
-                    System.out.print("New Password: ");
-                    String password = scanner.nextLine();
-                    boolean updated = userService.updateUserProfile(email, name, password);
-                    System.out.println(updated ? "User profile updated." : "User not found.");
-                }
-                case 7 -> {
                     System.out.println("Wellness Facilities:");
                     wellnessFacilityService.showAvailableFacilities();
                     System.out.println("Available Vehicles:");
@@ -203,7 +198,7 @@ public class MainController {
                     available.stream().filter(EventSpace::isAvailable)
                             .forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
                 }
-                case 8 -> {
+                case 7 -> {
                     System.out.println("Logging out...");
                     return;
                 }
@@ -219,7 +214,8 @@ public class MainController {
             System.out.println("2. Manage Transportation");
             System.out.println("3. Manage Rooms");
             System.out.println("4. Manage Event Spaces");
-            System.out.println("5. Logout");
+            System.out.println("5. Update Manager Profile");
+            System.out.println("6. Logout");
             System.out.print("Choose an option: ");
             int choice = Integer.parseInt(scanner.nextLine());
 
@@ -228,13 +224,31 @@ public class MainController {
                 case 2 -> transportationMenu();
                 case 3 -> roomMenu();
                 case 4 -> eventSpaceMenu();
-                case 5 -> {
+                case 5 -> updateOwnProfile();
+                case 6 -> {
                     System.out.println("Logging out...");
                     return;
                 }
+
                 default -> System.out.println("Invalid choice.");
             }
         }
+    }
+
+    private void updateOwnProfile() {
+        System.out.println("\n--- Update Profile ---");
+        System.out.print("New Name: ");
+        String name = scanner.nextLine();
+        System.out.print("New Password: ");
+        String password = scanner.nextLine();
+
+        boolean updated = userService.updateUserProfile(loggedInUserEmail, name, password);
+        System.out.println(updated ? "Profile updated successfully." : "Profile update failed.");
+    }
+
+    // Set the logged-in user's email when they log in
+    private void setLoggedInUserEmail(String email) {
+        this.loggedInUserEmail = email;
     }
 
     private void userMenu() {
@@ -248,7 +262,8 @@ public class MainController {
             System.out.println("6. Book Event Space");
             System.out.println("7. Book Wellness Facility");
             System.out.println("8. Book Transportation");
-            System.out.println("9. Logout");
+            System.out.println("9. Update User Profile");
+            System.out.println("10. Logout");
             System.out.print("Choose an option: ");
             int choice = Integer.parseInt(scanner.nextLine());
 
@@ -292,7 +307,8 @@ public class MainController {
                     String type = scanner.nextLine();
                     transportationService.bookVehicle(type);
                 }
-                case 9 -> {
+                case 9 -> updateOwnProfile();
+                case 10 -> {
                     System.out.println("Logging out...");
                     return;
                 }
