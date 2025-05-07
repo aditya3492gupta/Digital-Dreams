@@ -1,6 +1,5 @@
 package utility;
 
-import java.util.Scanner;
 import java.util.regex.Pattern;
 //validation
 public class Validation {
@@ -18,6 +17,7 @@ public class Validation {
 
     public static boolean isValidPhoneNumber(String phone) {
         return PHONE_PATTERN.matcher(phone).matches();
+<<<<<<< HEAD
     }
 
 
@@ -47,6 +47,8 @@ public class Validation {
     public String getStringInput(String prompt) {
         System.out.print(prompt);
         return scanner.nextLine().trim();
+=======
+>>>>>>> d5a52d145623ffcd8f5b0959a407c2bf7afa587d
     }
     
 }
