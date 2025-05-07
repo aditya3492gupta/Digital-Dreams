@@ -1,11 +1,26 @@
 package controller;
-
-import entity.*;
-import entity.user.*;
 import java.util.List;
 import java.util.Scanner;
-import repository.*;
-import service.*;
+
+import entity.EventSpace;
+import entity.GoldEventSpace;
+import entity.PlatinumEventSpace;
+import entity.Room;
+import entity.SilverEventSpace;
+import entity.user.Admin;
+import entity.user.RegularUser;
+import entity.user.ResourceManager;
+import entity.user.User;
+import repository.EventSpaceRepository;
+import repository.RoomRepository;
+import repository.TransportationRepository;
+import repository.UserRepository;
+import service.EventSpaceService;
+import service.RoomService;
+import service.TransportationService;
+import service.UserService;
+import service.WellnessFacilityService;
+import utility.Validation;
 
 public class MainController {
 
@@ -33,7 +48,9 @@ public class MainController {
         eventSpaceService = new EventSpaceService(eventSpaceRepository);
         initializeStaticData();
     }
+ 
 
+    Validation v = new Validation();
     public void start() {
         while (true) {
             System.out.println("\n===== Welcome to Resource Management System =====");
@@ -43,8 +60,7 @@ public class MainController {
             System.out.println("4. Register as Regular User");
 
             System.out.println("5. Exit");
-            System.out.print("Enter your choice: ");
-            int choice = Integer.parseInt(scanner.nextLine());
+            int choice = v.getIntInput("Enter your choice: ");
 
             switch (choice) {
                 case 1 -> adminLogin();
@@ -62,10 +78,8 @@ public class MainController {
     }
 
     private void adminLogin() {
-        System.out.print("Admin Email: ");
-        String email = scanner.nextLine();
-        System.out.print("Password: ");
-        String password = scanner.nextLine();
+        String email = v.getStringInput("Admin Email: ");
+        String password = v.getStringInput("Password: ");
         User user = userService.login(email, password);
         if (user instanceof Admin) {
             System.out.println("Admin logged in: " + user.getName());
@@ -76,10 +90,8 @@ public class MainController {
     }
 
     private void regularUserLogin() {
-        System.out.print("Email: ");
-        String email = scanner.nextLine();
-        System.out.print("Password: ");
-        String password = scanner.nextLine();
+        String email = v.getStringInput("Email: ");
+        String password = v.getStringInput("Password: ");
         User user = userService.login(email, password);
         if (user instanceof RegularUser) {
             System.out.println("Regular User logged in: " + user.getName());
@@ -90,10 +102,8 @@ public class MainController {
     }
 
     private void resourceManagerLogin() {
-        System.out.print("Email: ");
-        String email = scanner.nextLine();
-        System.out.print("Password: ");
-        String password = scanner.nextLine();
+        String email = v.getStringInput("Email: ");
+        String password = v.getStringInput("Password: ");
         User user = userService.login(email, password);
         if (user instanceof ResourceManager) {
             System.out.println("Resource Manager logged in: " + user.getName());
@@ -104,35 +114,23 @@ public class MainController {
     }
 
     private void registerRegularUser() {
-        System.out.print("Name: ");
-        String name = scanner.nextLine();
-        System.out.print("Email: ");
-        String email = scanner.nextLine();
-        
-        System.out.print("Password: ");
-        String password = scanner.nextLine();
-        System.out.print("Age: ");
-        int age = Integer.parseInt(scanner.nextLine());
-        System.out.print("Address: ");
-        String address = scanner.nextLine();
-        System.out.print("Phone: ");
-        String phone = scanner.nextLine();
+        String name = v.getStringInput("Name: ");
+        String email = v.getStringInput("Email: ");
+        String password = v.getStringInput("Password: ");
+        int age = v.getIntInput("Age: ");
+        String address = v.getStringInput("Address: ");
+        String phone = v.getStringInput("Phone: ");
 
         boolean success = userService.registerRegularUser(name, email, password, age, address, phone);
         System.out.println(success ? "User registered." : "Email already taken.");
     }
 
     private void registerResourceManager() {
-        System.out.print("Name: ");
-        String name = scanner.nextLine();
-        System.out.print("Email: ");
-        String email = scanner.nextLine();
-        System.out.print("Password: ");
-        String password = scanner.nextLine();
-        System.out.print("Age: ");
-        int age = Integer.parseInt(scanner.nextLine());
-        System.out.print("Phone: ");
-        String phone = scanner.nextLine();
+        String name = v.getStringInput("Name: ");
+        String email = v.getStringInput("Email: ");
+        String password = v.getStringInput("Password: ");
+        int age = v.getIntInput("Age: ");
+        String phone = v.getStringInput("Phone: ");
 
         boolean success = userService.registerResourceManager(name, email, password, age, phone);
         System.out.println(success ? "Manager registered." : "Email already taken.");
@@ -149,8 +147,7 @@ public class MainController {
             System.out.println("6. Update User Profile");
             System.out.println("7. View Available Resources");
             System.out.println("8. Logout");
-            System.out.print("Choose an option: ");
-            int choice = Integer.parseInt(scanner.nextLine());
+            int choice = v.getIntInput("Choose an option: ");
 
             switch (choice) {
                 case 1 -> {
@@ -164,8 +161,8 @@ public class MainController {
                 case 2 -> registerRegularUser(); // reuse existing method
                 case 3 -> registerResourceManager(); // reuse existing method
                 case 4 -> {
-                    System.out.print("Enter email of Regular User to delete: ");
-                    String email = scanner.nextLine();
+                    String email = v.getStringInput("Enter email of Regular User to delete: ");
+
                     if (userService.deleteRegularUser(email)) {
                         System.out.println("Regular user deleted.");
                     } else {
@@ -173,8 +170,7 @@ public class MainController {
                     }
                 }
                 case 5 -> {
-                    System.out.print("Enter email of Resource Manager to delete: ");
-                    String email = scanner.nextLine();
+                    String email = v.getStringInput("Enter email of Resource Manager to delete: ");
                     if (userService.deleteResourceManager(email)) {
                         System.out.println("Manager deleted.");
                     } else {
@@ -182,12 +178,10 @@ public class MainController {
                     }
                 }
                 case 6 -> {
-                    System.out.print("Enter email to update: ");
-                    String email = scanner.nextLine();
-                    System.out.print("New Name: ");
-                    String name = scanner.nextLine();
-                    System.out.print("New Password: ");
-                    String password = scanner.nextLine();
+                    String email = v.getStringInput("Enter email to update: ");
+                    String name = v.getStringInput("New Name: ");
+                    String password = v.getStringInput("New Password: ");
+
                     boolean updated = userService.updateUserProfile(email, name, password);
                     System.out.println(updated ? "User profile updated." : "User not found.");
                 }
@@ -220,8 +214,7 @@ public class MainController {
             System.out.println("3. Manage Rooms");
             System.out.println("4. Manage Event Spaces");
             System.out.println("5. Logout");
-            System.out.print("Choose an option: ");
-            int choice = Integer.parseInt(scanner.nextLine());
+            int choice = v.getIntInput("Choose an option: ");
 
             switch (choice) {
                 case 1 -> wellnessFacilityMenu();
@@ -249,8 +242,7 @@ public class MainController {
             System.out.println("7. Book Wellness Facility");
             System.out.println("8. Book Transportation");
             System.out.println("9. Logout");
-            System.out.print("Choose an option: ");
-            int choice = Integer.parseInt(scanner.nextLine());
+            int choice = v.getIntInput("Choose an option: ");
 
             switch (choice) {
                 case 1 -> wellnessFacilityService.showAvailableFacilities();
@@ -261,8 +253,7 @@ public class MainController {
                     availableSpaces.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
                 }
                 case 5 -> {
-                    System.out.print("Room Type to book (2AC / 2NAC / 4AC / 4NAC): ");
-                    String type = scanner.nextLine();
+                    String type = v.getStringInput("Room Type to book (2AC / 2NAC / 4AC / 4NAC): ");
 
                     Room booked = roomService.bookRoom(type);
                     if (booked != null) {
@@ -275,21 +266,17 @@ public class MainController {
                     List<EventSpace> allSpaces = eventSpaceService.getAllEventSpaces();
                     allSpaces.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
                     System.out.println();
-                    System.out.print("Type to book: ");
-                    String type = scanner.nextLine();
+                    String type = v.getStringInput("Type to book: ");
                     eventSpaceService.bookEventSpaceByType(type);
                 }
                 case 7 -> {
-                    System.out.print("Enter type to book(Gym / Swimming Pool): ");
-                    String type = scanner.nextLine();
-                    System.out.print("Enter number of hours: ");
-                    int hours = Integer.parseInt(scanner.nextLine());
+                    String type = v.getStringInput("Enter type to book(Gym / Swimming Pool): ");
+                    int hours = v.getIntInput("Enter number of hours: ");
                     wellnessFacilityService.bookFacilityWithHours(type, hours);
                 }
                 case 8 -> {
                     transportationService.showAvailableVehicles();
-                    System.out.print("Type vehicle Id to book: ");
-                    String type = scanner.nextLine();
+                    String type = v.getStringInput("Type vehicle Id to book: ");
                     transportationService.bookVehicle(type);
                 }
                 case 9 -> {
@@ -309,29 +296,21 @@ public class MainController {
             System.out.println("3. Release Facility");
             System.out.println("4. Show Available Facilities");
             System.out.println("5. Back to Previous Menu");
-            System.out.print("Choose an option: ");
-            int choice = Integer.parseInt(scanner.nextLine());
+            int choice = v.getIntInput("Choose an option: ");
 
             switch (choice) {
                 case 1 -> {
-                    System.out.print("Facility ID: ");
-                    String id = scanner.nextLine();
-                    System.out.print("Type: ");
-                    String type = scanner.nextLine();
-                    System.out.print("Price per Hour: ");
-                    double price = Double.parseDouble(scanner.nextLine());
+                    String id = v.getStringInput("Facility ID: ");
+                    String type = v.getStringInput("Type: ");                    double price = v.getDoubleInput("Price per Hour: ");
                     wellnessFacilityService.registerNewFacility(id, type, price);
                 }
                 case 2 -> {
-                    System.out.print("Enter type to book(Gym / Swimming Pool): ");
-                    String type = scanner.nextLine();
-                    System.out.print("Enter number of hours: ");
-                    int hours = Integer.parseInt(scanner.nextLine());
+                    String type = v.getStringInput("Enter type to book(Gym / Swimming Pool): ");
+                    int hours = v.getIntInput("Enter number of hours: ");
                     wellnessFacilityService.bookFacilityWithHours(type, hours);
                 }
                 case 3 -> {
-                    System.out.print("Enter facility ID to release: ");
-                    String id = scanner.nextLine();
+                    String id = v.getStringInput("Enter facility ID to release: ");
                     wellnessFacilityService.releaseFacility(id);
                 }
                 case 4 -> wellnessFacilityService.showAvailableFacilities();
@@ -350,28 +329,22 @@ public class MainController {
         System.out.println("2. Book Vehicle");
         System.out.println("3. Release Vehicle");
         System.out.println("4. Show Available Vehicles");
-        System.out.print("Choose an option: ");
-        int choice = Integer.parseInt(scanner.nextLine());
+        int choice = v.getIntInput("Choose an option: ");
 
         switch (choice) {
             case 1 -> {
-                System.out.print("Vehicle ID: ");
-                String id = scanner.nextLine();
-                System.out.print("Type: ");
-                String type = scanner.nextLine();
-                System.out.print("Cost: ");
-                double cost = Double.parseDouble(scanner.nextLine());
+                String id = v.getStringInput("Vehicle ID: ");
+                String type = v.getStringInput("Type: ");
+                double cost = v.getDoubleInput("Cost: ");
                 transportationService.addVehicle(id, type, cost, true);
             }
             case 2 -> {
                 transportationService.showAvailableVehicles();
-                System.out.print("Type vehicle Id to book: ");
-                String type = scanner.nextLine();
+                String type = v.getStringInput("Type vehicle Id to book: ");
                 transportationService.bookVehicle(type);
             }
             case 3 -> {
-                System.out.print("Type vehicle ID to release: ");
-                String id = scanner.nextLine();
+                String id = v.getStringInput("Type vehicle ID to release: ");
                 transportationService.releaseVehicle(id);
             }
             case 4 -> transportationService.showAvailableVehicles();
@@ -385,17 +358,14 @@ public class MainController {
         System.out.println("2. Book Room");
         System.out.println("3. Release Room");
         System.out.println("4. Show Available Rooms");
-        System.out.print("Choose an option: ");
-        int choice = Integer.parseInt(scanner.nextLine());
+        int choice = v.getIntInput("Choose an option: ");
 
         switch (choice) {
             case 1 -> {
-                System.out.print("Room ID: ");
-                String id = scanner.nextLine();
+                String id = v.getStringInput("Room ID: ");
                 System.out.print("Type (2AC / 2NAC / 4AC / 4NAC): ");
-                String type = scanner.nextLine();
-                System.out.print("Cost (in ₹): ");
-                double cost = Double.parseDouble(scanner.nextLine());
+                String type = v.getStringInput("Type (2AC / 2NAC / 4AC / 4NAC): ");
+                double cost = v.getDoubleInput("Cost (in ₹): ");
 
                 boolean added = roomService.addRoom(id, type, true, cost);
                 if (added) {
@@ -405,8 +375,7 @@ public class MainController {
                 }
             }
             case 2 -> {
-                System.out.print("Room Type to book (2AC / 2NAC / 4AC / 4NAC): ");
-                String type = scanner.nextLine();
+                String type = v.getStringInput("Room Type to book (2AC / 2NAC / 4AC / 4NAC): ");
 
                 Room booked = roomService.bookRoom(type);
                 if (booked != null) {
@@ -416,8 +385,7 @@ public class MainController {
                 }
             }
             case 3 -> {
-                System.out.print("Room ID to release: ");
-                String id = scanner.nextLine();
+                String id = v.getStringInput("Room ID to release: ");
                 boolean released = roomService.releaseRoom(id);
                 if (released) {
                     System.out.println("Room released successfully.");
@@ -437,34 +405,28 @@ public class MainController {
         System.out.println("3. Delete Event Space");
         System.out.println("4. Book Event Space");
         System.out.println("5. View All Event Spaces");
-        System.out.print("Choose an option: ");
-        int choice = Integer.parseInt(scanner.nextLine());
+        int choice = v.getIntInput("Choose an option: ");
 
         switch (choice) {
             case 1 -> {
-                System.out.print("Space ID: ");
-                String id = scanner.nextLine();
-                System.out.print("Type: ");
-                String type = scanner.nextLine();
+                String id = v.getStringInput("Space ID: ");
+                String type = v.getStringInput("Type: ");
                 eventSpaceService.createEventSpace(new EventSpace(id, type, true));
             }
             case 2 -> {
-                System.out.print("Type: ");
-                String type = scanner.nextLine();
+                String type = v.getStringInput("Type: ");
                 List<EventSpace> available = eventSpaceService.searchAvailableSpacesByType(type);
                 available.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
             }
             case 3 -> {
-                System.out.print("Space ID to delete: ");
-                String id = scanner.nextLine();
+                String id = v.getStringInput("Space ID to delete: ");
                 eventSpaceService.deleteEventSpace(id);
             }
             case 4 -> {
                 List<EventSpace> allSpaces = eventSpaceService.getAllEventSpaces();
                 allSpaces.forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
                 System.out.println();
-                System.out.print("Type to book: ");
-                String type = scanner.nextLine();
+                String type = v.getStringInput("Type to book: ");
                 eventSpaceService.bookEventSpaceByType(type);
             }
             case 5 -> {
