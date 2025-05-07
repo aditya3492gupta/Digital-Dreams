@@ -11,7 +11,6 @@ public class GoldEventSpace extends EventSpace {
         
     }
 
-    // Getters and setters for new properties
     public double getBookingCost() {
         return bookingCost;
     }

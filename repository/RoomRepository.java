@@ -1,11 +1,10 @@
 package repository;
 
+import entity.Room;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import entity.Room;
 
 public class RoomRepository {
     private Map<String, List<Room>> roomInventory;
@@ -115,5 +114,56 @@ public class RoomRepository {
             }
         }
         return null;
+    }
+    
+    /**
+     * Updates an existing room in the repository.
+     * If the room type is changed, the room will be moved to the new type's list.
+     * 
+     * @param updatedRoom The room with updated information
+     * @return true if the room was successfully updated, false otherwise
+     */
+    public boolean updateRoom(Room updatedRoom) {
+        if (updatedRoom == null) {
+            return false;
+        }
+        
+        // First, find and remove the existing room
+        Room existingRoom = null;
+        String existingType = null;
+        
+        for (Map.Entry<String, List<Room>> entry : roomInventory.entrySet()) {
+            for (Room room : entry.getValue()) {
+                if (room.getRoomId().equalsIgnoreCase(updatedRoom.getRoomId())) {
+                    existingRoom = room;
+                    existingType = entry.getKey();
+                    break;
+                }
+            }
+            if (existingRoom != null) {
+                break;
+            }
+        }
+        
+        // If room not found, return false
+        if (existingRoom == null) {
+            return false;
+        }
+        
+        // If the room type has changed, handle moving it to the new type list
+        if (!existingType.equals(updatedRoom.getType())) {
+            // Remove from old type list
+            roomInventory.get(existingType).remove(existingRoom);
+            
+            // Add to new type list (ensure the list exists)
+            roomInventory.putIfAbsent(updatedRoom.getType(), new ArrayList<>());
+            roomInventory.get(updatedRoom.getType()).add(updatedRoom);
+        } else {
+            // Simply replace the room in its existing list
+            int index = roomInventory.get(existingType).indexOf(existingRoom);
+            roomInventory.get(existingType).set(index, updatedRoom);
+        }
+        
+        return true;
     }
 }

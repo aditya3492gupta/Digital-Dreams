@@ -1,9 +1,8 @@
 package service;
 
 import entity.*;
-import repository.EventSpaceRepository;
-
 import java.util.List;
+import repository.EventSpaceRepository;
 
 public class EventSpaceService {
     private final EventSpaceRepository eventSpaceRepository;
@@ -54,34 +53,90 @@ public class EventSpaceService {
         return eventSpaceRepository.findAvailableSpacesByType(type);
     }
 
-    // Book an available EventSpace of a given type and show cost
-    public void bookEventSpaceByType(String type) {
+    /**
+     * Book a specific event space by its ID
+     * @param spaceId the ID of the event space to book
+     * @return the booked EventSpace if successful, null if the space doesn't exist or is already booked
+     */
+    public EventSpace bookEventSpace(String spaceId) {
+        EventSpace space = eventSpaceRepository.getEventSpace(spaceId);
+        if (space != null && space.isAvailable()) {
+            space.setAvailable(false);
+            eventSpaceRepository.updateEventSpace(space);
+            
+            System.out.println("Event space booked: " + space.getSpaceId());
+            printBookingDetails(space);
+            return space;
+        }
+        
+        if (space == null) {
+            System.out.println("Event space with ID " + spaceId + " not found.");
+        } else {
+            System.out.println("Event space " + spaceId + " is already booked.");
+        }
+        return null;
+    }
+
+    /**
+     * Book an available EventSpace of a given type
+     * @param type the type of event space to book (e.g., "Gold", "Silver", "Platinum")
+     * @return the booked EventSpace if successful, null if no spaces of that type are available
+     */
+    public EventSpace bookEventSpaceByType(String type) {
         List<EventSpace> available = eventSpaceRepository.findAvailableSpacesByType(type);
 
         if (available.isEmpty()) {
             System.out.println("No available " + type + " event spaces.");
-            return;
+            return null;
         }
 
         EventSpace selected = available.get(0);
         selected.setAvailable(false);
         eventSpaceRepository.updateEventSpace(selected);
 
+        System.out.println("Event space booked: " + selected.getSpaceId());
+        printBookingDetails(selected);
+        return selected;
+    }
+    
+    /**
+     * Release a booked event space (make it available again)
+     * @param spaceId the ID of the event space to release
+     * @return true if the space was successfully released, false otherwise
+     */
+    public boolean releaseEventSpace(String spaceId) {
+        EventSpace space = eventSpaceRepository.getEventSpace(spaceId);
+        if (space != null && !space.isAvailable()) {
+            space.setAvailable(true);
+            eventSpaceRepository.updateEventSpace(space);
+            System.out.println("Event space released: " + spaceId);
+            return true;
+        }
+        
+        if (space == null) {
+            System.out.println("Event space with ID " + spaceId + " not found.");
+        } else {
+            System.out.println("Event space " + spaceId + " is already available.");
+        }
+        return false;
+    }
+    
+    // Helper method to print booking details
+    private void printBookingDetails(EventSpace space) {
         double cost = 0.0;
         boolean hasCatering = false;
 
-        if (selected instanceof GoldEventSpace gold) {
+        if (space instanceof GoldEventSpace gold) {
             cost = gold.getBookingCost();
             hasCatering = gold.hasCatering();
-        } else if (selected instanceof SilverEventSpace silver) {
+        } else if (space instanceof SilverEventSpace silver) {
             cost = silver.getBookingCost();
             hasCatering = silver.hasCatering();
-        } else if (selected instanceof PlatinumEventSpace platinum) {
+        } else if (space instanceof PlatinumEventSpace platinum) {
             cost = platinum.getBookingCost();
             hasCatering = platinum.hasCatering();
         }
 
-        System.out.println("Event space booked: " + selected.getSpaceId());
         System.out.println("Cost: ₹" + cost);
         System.out.println("Catering included: " + (hasCatering ? "Yes" : "No"));
     }

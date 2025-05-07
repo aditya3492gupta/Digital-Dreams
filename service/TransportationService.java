@@ -1,8 +1,7 @@
 package service;
 
-import java.util.List;
-
 import entity.Transportation;
+import java.util.List;
 import repository.TransportationRepository;
 
 public class TransportationService {
@@ -29,6 +28,25 @@ public class TransportationService {
             System.out.println("Booking failed. Vehicle not found or already booked.");
         }
     }
+    
+    /**
+     * Books a specific vehicle by ID.
+     * 
+     * @param vehicleId The ID of the vehicle to book
+     * @return true if the booking was successful, false otherwise
+     */
+    public boolean bookSpecificVehicle(String vehicleId) {
+        Transportation vehicle = transportationRepository.getVehicleById(vehicleId);
+        if (vehicle != null && vehicle.isAvailable()) {
+            vehicle.setAvailable(false);
+            transportationRepository.updateVehicle(vehicle);
+            System.out.println("Vehicle booked: " + vehicle.getVehicleId() + " - " + vehicle.getVehicleType());
+            System.out.println("Cost: ₹" + vehicle.getCost());
+            return true;
+        }
+        System.out.println("Vehicle " + vehicleId + " is not available for booking.");
+        return false;
+    }
 
     // Method to release a vehicle based on its ID
     public boolean releaseVehicle(String vehicleId) {
@@ -54,5 +72,35 @@ public class TransportationService {
     // Method to cancel a vehicle booking by vehicle ID
     public boolean cancelBooking(String vehicleId) {
         return transportationRepository.cancelBooking(vehicleId);
+    }
+    
+    /**
+     * Updates an existing vehicle in the system.
+     * 
+     * @param vehicle The vehicle with updated information
+     * @return true if the vehicle was successfully updated, false otherwise
+     */
+    public boolean updateVehicle(Transportation vehicle) {
+        if (vehicle == null) {
+            System.out.println("Cannot update: vehicle is null");
+            return false;
+        }
+        
+        Transportation existingVehicle = transportationRepository.getVehicleById(vehicle.getVehicleId());
+        
+        if (existingVehicle == null) {
+            System.out.println("Cannot update: vehicle not found with ID: " + vehicle.getVehicleId());
+            return false;
+        }
+        
+        boolean updated = transportationRepository.updateVehicle(vehicle);
+        
+        if (updated) {
+            System.out.println("Successfully updated vehicle: " + vehicle.getVehicleId());
+        } else {
+            System.out.println("Failed to update vehicle: " + vehicle.getVehicleId());
+        }
+        
+        return updated;
     }
 }

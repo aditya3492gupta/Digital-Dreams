@@ -1,7 +1,6 @@
 package repository;
 
 import entity.Transportation;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,8 +40,6 @@ public class TransportationRepository {
         return null; // Return null if no vehicle found with the given ID
     }
 
-    // Method to book a vehicle by its ID (set its availability to false)
-    // Book a vehicle by its ID and return the cost if successful
     public Double bookVehicle(String id) {
         Transportation vehicle = getVehicleById(id);
         if (vehicle != null && vehicle.isAvailable()) {
@@ -62,7 +59,6 @@ public class TransportationRepository {
         return false; // Return false if the vehicle was not found or already available
     }
 
-    // Method to show all available vehicles (vehicles that are not booked)
     public void showAvailableVehicles() {
         System.out.println("Available Vehicles:");
         for (Transportation v : vehicles) {
@@ -72,8 +68,24 @@ public class TransportationRepository {
         }
     }
 
-    // Method to cancel a vehicle booking by vehicle ID (set availability to true)
     public boolean cancelBooking(String id) {
-        return releaseVehicle(id); // Cancel booking by releasing the vehicle
+        return releaseVehicle(id);
+    }
+    
+
+    public boolean updateVehicle(Transportation updatedVehicle) {
+        if (updatedVehicle == null) {
+            return false;
+        }
+        
+        for (int i = 0; i < vehicles.size(); i++) {
+            if (vehicles.get(i).getVehicleId().equalsIgnoreCase(updatedVehicle.getVehicleId())) {
+                vehicles.set(i, updatedVehicle);
+                return true;
+            }
+        }
+        
+        // Vehicle not found
+        return false;
     }
 }

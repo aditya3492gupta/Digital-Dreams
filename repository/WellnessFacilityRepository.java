@@ -2,92 +2,99 @@ package repository;
 
 import entity.WellnessFacility;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 public class WellnessFacilityRepository {
-    private Map<String, List<WellnessFacility>> facilityInventory;
+    private final List<WellnessFacility> facilities;
 
     public WellnessFacilityRepository() {
-        facilityInventory = new HashMap<>();
-        initializeFacilities();
-    }
-
-    private void initializeFacilities() {
-        facilityInventory.put("Swimming Pool", new ArrayList<>());
-        facilityInventory.put("Gym", new ArrayList<>());
-
-        int defaultQuantity = 3;
-
-        for (int i = 1; i <= defaultQuantity; i++) {
-            facilityInventory.get("Swimming Pool")
-                    .add(new WellnessFacility("SP" + i, "Swimming Pool", true, 200.0));
-            facilityInventory.get("Gym")
-                    .add(new WellnessFacility("GYM" + i, "Gym", true, 150.0));
-        }
+        this.facilities = new ArrayList<>();
     }
 
     public boolean addFacility(WellnessFacility facility) {
-        facilityInventory.putIfAbsent(facility.getType(), new ArrayList<>());
-
-        for (WellnessFacility f : facilityInventory.get(facility.getType())) {
-            if (f.getFacilityId().equalsIgnoreCase(facility.getFacilityId())) {
-                return false; // Duplicate ID
-            }
+        if (facility == null) {
+            return false;
         }
 
-        facilityInventory.get(facility.getType()).add(facility);
+        // Check if a facility with the same ID already exists
+        boolean facilityExists = facilities.stream()
+                .anyMatch(f -> f.getFacilityId().equals(facility.getFacilityId()));
+
+        if (facilityExists) {
+            return false;
+        }
+
+        facilities.add(facility);
         return true;
     }
 
-    public WellnessFacility bookFacility(String type) {
-        List<WellnessFacility> facilities = facilityInventory.get(type);
-        if (facilities != null) {
-            for (WellnessFacility f : facilities) {
-                if (f.isAvailable()) {
-                    f.setAvailable(false);
-                    System.out.println("Facility booked: " + f.getFacilityId());
-                    return f;
-                }
-            }
+    public WellnessFacility bookFacility(String facilityType) {
+        Optional<WellnessFacility> facilityToBook = facilities.stream()
+                .filter(f -> f.getType().equalsIgnoreCase(facilityType) && f.isAvailable())
+                .findFirst();
+
+        if (facilityToBook.isPresent()) {
+            WellnessFacility facility = facilityToBook.get();
+            facility.setAvailable(false);
+            return facility;
         }
-        System.out.println("No available facility for type: " + type);
+
         return null;
     }
 
     public boolean releaseFacility(String facilityId) {
-        for (List<WellnessFacility> facilities : facilityInventory.values()) {
-            for (WellnessFacility f : facilities) {
-                if (f.getFacilityId().equalsIgnoreCase(facilityId)) {
-                    if (!f.isAvailable()) {
-                        f.setAvailable(true);
-                        System.out.println("Facility released: " + facilityId);
-                        return true;
-                    } else {
-                        System.out.println("Facility already available: " + facilityId);
-                        return false;
-                    }
-                }
-            }
+        Optional<WellnessFacility> facilityToRelease = facilities.stream()
+                .filter(f -> f.getFacilityId().equals(facilityId))
+                .findFirst();
+
+        if (facilityToRelease.isPresent()) {
+            WellnessFacility facility = facilityToRelease.get();
+            facility.setAvailable(true);
+            return true;
         }
-        System.out.println("Facility not found: " + facilityId);
+
         return false;
     }
 
-    public List<WellnessFacility> getAllFacilities() {
-        List<WellnessFacility> all = new ArrayList<>();
-        for (List<WellnessFacility> list : facilityInventory.values()) {
-            all.addAll(list);
+    public boolean updateFacility(WellnessFacility updatedFacility) {
+        if (updatedFacility == null) {
+            return false;
         }
-        return all;
+        
+        for (int i = 0; i < facilities.size(); i++) {
+            if (facilities.get(i).getFacilityId().equals(updatedFacility.getFacilityId())) {
+                facilities.set(i, updatedFacility);
+                return true;
+            }
+        }
+        
+        // Facility not found
+        return false;
     }
 
+
+    public List<WellnessFacility> getAllFacilities() {
+        return new ArrayList<>(facilities);
+    }
+
+    public WellnessFacility getFacilityById(String facilityId) {
+        return facilities.stream()
+                .filter(f -> f.getFacilityId().equals(facilityId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    
     public void showAvailableFacilities() {
         System.out.println("Available Wellness Facilities:");
-        for (Map.Entry<String, List<WellnessFacility>> entry : facilityInventory.entrySet()) {
-            long available = entry.getValue().stream().filter(WellnessFacility::isAvailable).count();
-            System.out.println(entry.getKey() + ": " + available + " available");
-        }
+        
+        facilities.stream()
+                .filter(WellnessFacility::isAvailable)
+                .forEach(facility -> {
+                    System.out.println("ID: " + facility.getFacilityId() +
+                            ", Type: " + facility.getType() +
+                            ", Price per hour: ₹" + facility.getPricePerHour());
+                });
     }
 }
