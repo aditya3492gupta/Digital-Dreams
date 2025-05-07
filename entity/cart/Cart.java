@@ -1,16 +1,19 @@
 package entity.cart;
 
-
+import service.CartHistoryService;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Cart {
     private String userId;
     private List<CartItem> items;
+    private CartHistoryService cartHistoryService;
+
     
     public Cart(String userId) {
         this.userId = userId;
         this.items = new ArrayList<>();
+        this.cartHistoryService = new CartHistoryService();
     }
     
     public String getUserId() {
@@ -23,14 +26,20 @@ public class Cart {
     
     public void addItem(CartItem item) {
         items.add(item);
+        cartHistoryService.saveCartHistory(this);
     }
     
     public boolean removeItem(String itemId) {
-        return items.removeIf(item -> item.getItemId().equals(itemId));
+        boolean removed = items.removeIf(item -> item.getItemId().equals(itemId));
+        if (removed) {
+            cartHistoryService.saveCartHistory(this);  // Save history whenever an item is removed
+        }
+        return removed;
     }
-    
+
     public void clearCart() {
         items.clear();
+        cartHistoryService.saveCartHistory(this);  
     }
     
     public double getTotalCost() {
