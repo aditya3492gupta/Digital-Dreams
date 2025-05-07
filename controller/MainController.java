@@ -147,7 +147,7 @@ public class MainController {
             setLoggedInUserEmail(email);
 
             managerMenu();
-            currentUserId = null; // Reset current user on logout
+            currentUserId = null; 
         } else {
             System.out.println("Invalid credentials.");
         }
