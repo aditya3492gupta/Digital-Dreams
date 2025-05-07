@@ -223,7 +223,7 @@ public class MainController {
                     userService.getAllResourceManagers()
                             .forEach(m -> System.out.println(m.getName() + " - " + m.getEmail()));
                 }
-                case 2 -> registerRegularUser(); // reuse existing method
+                case 2 -> registerRegularUser();
                 case 3 -> registerResourceManager(); // reuse existing method
                 case 4 -> {
                     String email = v.getStringInput("Enter email of Regular User to delete: ");
