@@ -1,4 +1,5 @@
 package controller;
+
 import entity.*;
 import entity.cart.Cart;
 import entity.cart.CartItem;
@@ -81,7 +82,7 @@ public class MainController {
 
     public void start() {
         while (true) {
-            System.out.println("\n===== Welcome to Resource Management System =====");
+            System.out.println("\n========= Welcome to Digital Dreams =========");
             System.out.println("1. Admin Login");
             System.out.println("2. Regular User Login");
             System.out.println("3. Resource Manager Login");
@@ -152,7 +153,7 @@ public class MainController {
             setLoggedInUserEmail(email);
 
             managerMenu();
-            currentUserId = null; 
+            currentUserId = null;
         } else {
             System.out.println("Invalid credentials.");
         }
@@ -161,9 +162,9 @@ public class MainController {
     private void registerRegularUser() {
         String name = v.getStringInput("Name: ");
         String email = v.getStringInput("Email: ");
-         if (!Validation.isValidEmail(email)) {
-        System.out.println("Invalid email format.");
-        return;
+        if (!Validation.isValidEmail(email)) {
+            System.out.println("Invalid email format.");
+            return;
         }
         String password = v.getStringInput("Password: ");
         if (!Validation.isValidPassword(password)) {
@@ -301,13 +302,12 @@ public class MainController {
 
     private void updateOwnProfile() {
         System.out.println("\n--- Update Profile ---");
-       String name = v.getStringInput("New Name: ");
+        String name = v.getStringInput("New Name: ");
         String password = v.getStringInput("New Password: ");
         if (!Validation.isValidPassword(password)) {
             System.out.println("Password too weak.");
             return;
         }
-
 
         boolean updated = userService.updateUserProfile(loggedInUserEmail, name, password);
         System.out.println(updated ? "Profile updated successfully." : "Profile update failed.");
