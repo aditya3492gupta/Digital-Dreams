@@ -108,6 +108,7 @@ public class MainController {
         String name = scanner.nextLine();
         System.out.print("Email: ");
         String email = scanner.nextLine();
+        
         System.out.print("Password: ");
         String password = scanner.nextLine();
         System.out.print("Age: ");
