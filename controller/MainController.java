@@ -277,10 +277,8 @@ public class MainController {
 
     private void updateOwnProfile() {
         System.out.println("\n--- Update Profile ---");
-        System.out.print("New Name: ");
-        String name = scanner.nextLine();
-        System.out.print("New Password: ");
-        String password = scanner.nextLine();
+        String name = v.getStringInput("New Name: ");
+        String password = v.getStringInput("New Password: ");
 
         boolean updated = userService.updateUserProfile(loggedInUserEmail, name, password);
         System.out.println(updated ? "Profile updated successfully." : "Profile update failed.");
@@ -339,8 +337,7 @@ public class MainController {
         // Show available rooms
         roomService.showAvailableRooms();
 
-        System.out.print("Room ID to add to cart: ");
-        String roomId = scanner.nextLine();
+        String roomId = v.getStringInput("Room ID to add to cart: ");
 
         Room room = roomService.getRoomById(roomId);
         if (room != null && room.isAvailable()) {
@@ -359,8 +356,7 @@ public class MainController {
                 .filter(EventSpace::isAvailable)
                 .forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
 
-        System.out.print("Event Space ID to add to cart: ");
-        String spaceId = scanner.nextLine();
+        String spaceId = v.getStringInput("Event Space ID to add to cart: ");
 
         EventSpace space = eventSpaceService.getEventSpaceById(spaceId);
         if (space != null && space.isAvailable()) {
@@ -385,11 +381,9 @@ public class MainController {
         // Show available facilities
         wellnessFacilityService.showAvailableFacilities();
 
-        System.out.print("Facility ID to add to cart: ");
-        String facilityId = scanner.nextLine();
+        String facilityId = v.getStringInput("Facility ID to add to cart: ");
 
-        System.out.print("Number of hours: ");
-        int hours = Integer.parseInt(scanner.nextLine());
+        int hours = v.getIntInput("Number of hours: ");
 
         // We need to assume WellnessFacility has a getFacilityById method
         WellnessFacility facility = wellnessFacilityService.getFacilityById(facilityId);
@@ -410,8 +404,7 @@ public class MainController {
         // Show available vehicles
         transportationService.showAvailableVehicles();
 
-        System.out.print("Vehicle ID to add to cart: ");
-        String vehicleId = scanner.nextLine();
+        String vehicleId = v.getStringInput("Vehicle ID to add to cart: ");
 
         // We need to assume TransportationService has a getVehicleById method
         Transportation vehicle = transportationService.getVehicleById(vehicleId);
@@ -453,13 +446,11 @@ public class MainController {
         System.out.println("\n1. Remove item from cart");
         System.out.println("2. Clear cart");
         System.out.println("3. Back to menu");
-        System.out.print("Choose an option: ");
 
-        int choice = Integer.parseInt(scanner.nextLine());
+        int choice = v.getIntInput("Choose an option: ");
         switch (choice) {
             case 1 -> {
-                System.out.print("Enter item number to remove: ");
-                int itemIndex = Integer.parseInt(scanner.nextLine()) - 1;
+                int itemIndex = v.getIntInput("Enter item number to remove: ") - 1;
 
                 if (itemIndex >= 0 && itemIndex < items.size()) {
                     CartItem itemToRemove = items.get(itemIndex);
@@ -497,8 +488,7 @@ public class MainController {
         System.out.println("\n--- Checkout ---");
         viewCart(); // Show the cart contents first
 
-        System.out.print("\nProceed with checkout? (y/n): ");
-        String confirm = scanner.nextLine();
+        String confirm = v.getStringInput("\nProceed with checkout? (y/n): ");
 
         if (confirm.equalsIgnoreCase("y")) {
             boolean success = cartService.checkout(currentUserId);
@@ -662,8 +652,7 @@ public class MainController {
                 }
             }
             case 4 -> {
-                System.out.print("Type to book: ");
-                String type = scanner.nextLine();
+                String type = v.getStringInput("Type to book: ");
                 EventSpace booked = eventSpaceService.bookEventSpaceByType(type);
                 if (booked != null) {
                     System.out.println("Event space booked successfully!");
@@ -677,8 +666,7 @@ public class MainController {
                 allSpaces.forEach(e -> System.out
                         .println(e.getSpaceId() + " - " + e.getType() + " - Available: " + e.isAvailable()));
 
-                System.out.print("\nSpace ID to book: ");
-                String id = scanner.nextLine();
+                String id = v.getStringInput("\nSpace ID to book: ");
                 EventSpace booked = eventSpaceService.bookEventSpace(id);
                 if (booked != null) {
                     System.out.println("Event space booked successfully!");
@@ -691,8 +679,7 @@ public class MainController {
                 allSpaces.forEach(e -> System.out
                         .println(e.getSpaceId() + " - " + e.getType() + " - Available: " + e.isAvailable()));
 
-                System.out.print("\nSpace ID to release: ");
-                String id = scanner.nextLine();
+                String id = v.getStringInput("\nSpace ID to release: ");
                 boolean released = eventSpaceService.releaseEventSpace(id);
                 if (released) {
                     System.out.println("Event space released successfully!");
