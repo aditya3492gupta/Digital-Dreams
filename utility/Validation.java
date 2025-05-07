@@ -67,6 +67,22 @@ public class Validation {
             }
         }
     }
+
+    public double getPositiveDoubleInput(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            try {
+                double value = Double.parseDouble(scanner.nextLine());
+                if (value > 0.0) {
+                    return value;
+                } else {
+                    System.out.println("Invalid input. Please enter positive cost.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid cost.");
+            }
+        }
+    }
     
     
 }

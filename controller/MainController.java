@@ -539,7 +539,8 @@ public class MainController {
                 case 1 -> {
                     String id = v.getStringInput("Facility ID: ");
                     String type = v.getStringInput("Type: ");
-                    double price = v.getDoubleInput("Price per Hour: ");
+                    double price = v.getPositiveDoubleInput("Price per Hour: ");
+                    
                     wellnessFacilityService.registerNewFacility(id, type, price);
                 }
                 case 2 -> {
@@ -573,7 +574,7 @@ public class MainController {
             case 1 -> {
                 String id = v.getStringInput("Vehicle ID: ");
                 String type = v.getStringInput("Type: ");
-                double cost = v.getDoubleInput("Cost: ");
+                double cost = v.getPositiveDoubleInput("Cost: ");
                 transportationService.addVehicle(id, type, cost, true);
             }
             case 2 -> {
@@ -603,7 +604,7 @@ public class MainController {
                 String id = v.getStringInput("Room ID: ");
                 System.out.print("Type (2AC / 2NAC / 4AC / 4NAC): ");
                 String type = v.getStringInput("Type (2AC / 2NAC / 4AC / 4NAC): ");
-                double cost = v.getDoubleInput("Cost (in ₹): ");
+                double cost = v.getPositiveDoubleInput("Cost (in ₹): ");
 
                 boolean added = roomService.addRoom(id, type, true, cost);
                 if (added) {
