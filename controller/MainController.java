@@ -5,11 +5,13 @@ import entity.cart.CartItem;
 import entity.user.*;
 import java.util.List;
 import java.util.Scanner;
+
 import entity.EventSpace;
 import entity.GoldEventSpace;
 import entity.PlatinumEventSpace;
 import entity.Room;
 import entity.SilverEventSpace;
+
 import entity.user.Admin;
 import entity.user.RegularUser;
 import entity.user.ResourceManager;
@@ -150,7 +152,7 @@ public class MainController {
             setLoggedInUserEmail(email);
 
             managerMenu();
-            currentUserId = null; // Reset current user on logout
+            currentUserId = null; 
         } else {
             System.out.println("Invalid credentials.");
         }
@@ -159,10 +161,22 @@ public class MainController {
     private void registerRegularUser() {
         String name = v.getStringInput("Name: ");
         String email = v.getStringInput("Email: ");
+         if (!Validation.isValidEmail(email)) {
+        System.out.println("Invalid email format.");
+        return;
+        }
         String password = v.getStringInput("Password: ");
+        if (!Validation.isValidPassword(password)) {
+            System.out.println("Password too weak.");
+            return;
+        }
         int age = v.getIntInput("Age: ");
         String address = v.getStringInput("Address: ");
         String phone = v.getStringInput("Phone: ");
+        if (!Validation.isValidPhoneNumber(phone)) {
+            System.out.println("Enter correct phn no");
+            return;
+        }
 
         boolean success = userService.registerRegularUser(name, email, password, age, address, phone);
         System.out.println(success ? "User registered." : "Email already taken.");
@@ -171,9 +185,21 @@ public class MainController {
     private void registerResourceManager() {
         String name = v.getStringInput("Name: ");
         String email = v.getStringInput("Email: ");
+        if (!Validation.isValidEmail(email)) {
+            System.out.println("Invalid email format.");
+            return;
+        }
         String password = v.getStringInput("Password: ");
+        if (!Validation.isValidPassword(password)) {
+            System.out.println("Password too weak.");
+            return;
+        }
         int age = v.getIntInput("Age: ");
         String phone = v.getStringInput("Phone: ");
+        if (!Validation.isValidPhoneNumber(phone)) {
+            System.out.println("Enter correct phn no");
+            return;
+        }
 
         boolean success = userService.registerResourceManager(name, email, password, age, phone);
         System.out.println(success ? "Manager registered." : "Email already taken.");
@@ -202,7 +228,7 @@ public class MainController {
                     userService.getAllResourceManagers()
                             .forEach(m -> System.out.println(m.getName() + " - " + m.getEmail()));
                 }
-                case 2 -> registerRegularUser(); // reuse existing method
+                case 2 -> registerRegularUser();
                 case 3 -> registerResourceManager(); // reuse existing method
                 case 4 -> {
                     String email = v.getStringInput("Enter email of Regular User to delete: ");
@@ -275,8 +301,13 @@ public class MainController {
 
     private void updateOwnProfile() {
         System.out.println("\n--- Update Profile ---");
-        String name = v.getStringInput("New Name: ");
+       String name = v.getStringInput("New Name: ");
         String password = v.getStringInput("New Password: ");
+        if (!Validation.isValidPassword(password)) {
+            System.out.println("Password too weak.");
+            return;
+        }
+
 
         boolean updated = userService.updateUserProfile(loggedInUserEmail, name, password);
         System.out.println(updated ? "Profile updated successfully." : "Profile update failed.");
