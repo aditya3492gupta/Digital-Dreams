@@ -4,12 +4,21 @@ public class EventSpace {
     private String spaceId;
     private String type; // Gold/Silver/Platinum
     private boolean isAvailable;
+    private int noOfDays;
 
     public EventSpace(String spaceId, String type, boolean isAvailable) {
         this.spaceId = spaceId;
         this.type = type;
         this.isAvailable = isAvailable;
     }
+
+    public EventSpace(String spaceId, String type, boolean isAvailable,int noOfDays) {
+        this.spaceId = spaceId;
+        this.type = type;
+        this.isAvailable = isAvailable;
+        this.noOfDays=noOfDays;
+    }
+
 
     public String getSpaceId() {
         return spaceId;

@@ -162,7 +162,7 @@ public class MainController {
             System.out.println("Password too weak.");
             return;
         }
-        int age = v.getPositiveIntInput("Age: ");
+        int age = v.getPositiveAgeInput("Age: ");
         String address = v.getStringInput("Address: ");
         String phone = v.getStringInput("Phone: ");
         if (!Validation.isValidPhoneNumber(phone)) {
@@ -186,7 +186,7 @@ public class MainController {
             System.out.println("Password too weak.");
             return;
         }
-        int age = v.getPositiveIntInput("Age: ");
+        int age = v.getPositiveAgeInput("Age: ");
         String phone = v.getStringInput("Phone: ");
         if (!Validation.isValidPhoneNumber(phone)) {
             System.out.println("Enter correct phn no");
@@ -375,11 +375,13 @@ public class MainController {
         roomService.getAllRooms();
         System.out.println();
 
+
         String roomId = v.getStringInput("Enter Room ID to add to cart: ");
+        int noOfDays=v.getPositiveIntInput("Enter no. of Days: " );
 
         Room room = roomService.getRoomById(roomId);
         if (room != null && room.isAvailable()) {
-            cartService.addRoomToCart(currentUserId, room.getRoomId(), room.getType(), room.getCost());
+            cartService.addRoomToCart(currentUserId, room.getRoomId(), room.getType(), room.getCost(),noOfDays);
             System.out.println("Room added to cart!");
         } else {
             System.out.println("Room not available or not found.");
@@ -395,6 +397,7 @@ public class MainController {
                 .forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
 
         String spaceId = v.getStringInput("Event Space ID to add to cart: ");
+        int noOfDays=v.getPositiveIntInput("No. Of Days: ");
 
         EventSpace space = eventSpaceService.getEventSpaceById(spaceId);
         if (space != null && space.isAvailable()) {
@@ -408,7 +411,7 @@ public class MainController {
                 cost = platinum.getBookingCost();
             }
 
-            cartService.addEventSpaceToCart(currentUserId, space.getSpaceId(), space.getType(), cost);
+            cartService.addEventSpaceToCart(currentUserId, space.getSpaceId(), space.getType(), cost,noOfDays);
             System.out.println("Event Space added to cart!");
         } else {
             System.out.println("Event Space not available or not found.");
@@ -443,6 +446,7 @@ public class MainController {
         transportationService.showAvailableVehicles();
 
         String vehicleId = v.getStringInput("Vehicle ID to add to cart: ");
+        int noOfDays=v.getPositiveIntInput("No. Of Days: ");
 
         // We need to assume TransportationService has a getVehicleById method
         Transportation vehicle = transportationService.getVehicleById(vehicleId);
@@ -451,7 +455,9 @@ public class MainController {
                     currentUserId,
                     vehicle.getVehicleId(),
                     vehicle.getVehicleType(),
-                    vehicle.getCost());
+                    vehicle.getCost(),
+                    noOfDays
+                    );
             System.out.println("Vehicle added to cart!");
         } else {
             System.out.println("Vehicle not available or not found.");
@@ -562,7 +568,7 @@ public class MainController {
                 }
                 case 2 -> {
                     String type = v.getStringInput("Enter type to book(Gym / Swimming Pool): ");
-                    int hours = v.getIntInput("Enter number of hours: ");
+                    int hours = v.getPositiveIntInput("Enter number of hours: ");
                     wellnessFacilityService.bookFacilityWithHours(type, hours);
                 }
                 case 3 -> {
@@ -640,6 +646,7 @@ public class MainController {
                 System.out.print("Type (2AC / 2NAC / 4AC / 4NAC): ");
                 String type = v.getStringInput("Type (2AC / 2NAC / 4AC / 4NAC): ");
                 double cost = v.getPositiveDoubleInput("Cost (in ₹): ");
+                int noOfDays=v.getPositiveIntInput(" No. Of Days: ");
 
                 boolean added = roomService.addRoom(id, type, true, cost);
                 if (added) {
