@@ -1,7 +1,6 @@
 package service;
 
 import entity.Room;
-import java.util.List;
 import repository.RoomRepository;
 
 public class RoomService {
@@ -19,7 +18,7 @@ public class RoomService {
     public Room bookRoom(String type) {
         return roomRepository.bookRoom(type);
     }
-    
+
     /**
      * Books a specific room by its ID.
      * 
@@ -42,39 +41,40 @@ public class RoomService {
         return roomRepository.releaseRoom(roomId);
     }
 
-    public List<Room> getAllRooms() {
-        return roomRepository.getAllRooms();
+    public void getAllRooms() {
+        roomRepository.getAllRooms();
     }
 
     public void showAvailableRooms() {
         roomRepository.showAvailableRooms();
     }
 
+    // delete room by id
+    public boolean deleteRoom(String roomId) {
+        return roomRepository.deleteRoom(roomId);
+    }
+
     public Room getRoomById(String roomId) {
         return roomRepository.getRoomById(roomId);
     }
+
     
-    /**
-     * Updates an existing room in the system.
-     * 
-     * @param room The room with updated information
-     * @return true if the room was successfully updated, false otherwise
-     */
+
     public boolean updateRoom(Room room) {
         if (room == null) {
             System.out.println("Cannot update: room is null");
             return false;
         }
-        
+
         Room existingRoom = roomRepository.getRoomById(room.getRoomId());
-        
+
         if (existingRoom == null) {
             System.out.println("Cannot update: room not found with ID: " + room.getRoomId());
             return false;
         }
-        
+
         boolean updated = roomRepository.updateRoom(room);
-        
+
         if (updated) {
             System.out.println("Successfully updated room: " + room.getRoomId());
             if (!existingRoom.getType().equals(room.getType())) {
@@ -83,7 +83,7 @@ public class RoomService {
         } else {
             System.out.println("Failed to update room: " + room.getRoomId());
         }
-        
+
         return updated;
     }
 }

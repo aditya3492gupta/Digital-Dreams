@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class RoomRepository {
     private Map<String, List<Room>> roomInventory;
@@ -14,15 +15,13 @@ public class RoomRepository {
         initializeRooms();
     }
 
-    
     private void initializeRooms() {
         roomInventory.put("2AC", new ArrayList<>());
         roomInventory.put("2NAC", new ArrayList<>());
         roomInventory.put("4AC", new ArrayList<>());
         roomInventory.put("4NAC", new ArrayList<>());
 
-
-        int defaultQuantity = 5; 
+        int defaultQuantity = 5;
 
         for (int i = 1; i <= defaultQuantity; i++) {
             roomInventory.get("2AC").add(new Room("2AC" + i, "2AC", true, 1200.0));
@@ -37,7 +36,7 @@ public class RoomRepository {
 
         for (Room r : roomInventory.get(room.getType())) {
             if (r.getRoomId().equalsIgnoreCase(room.getRoomId())) {
-                return false; 
+                return false;
             }
         }
 
@@ -45,7 +44,6 @@ public class RoomRepository {
         return true;
     }
 
-    // Get all rooms of a type
     public List<Room> getRoomsByType(String type) {
         return roomInventory.getOrDefault(type, new ArrayList<>());
     }
@@ -86,6 +84,17 @@ public class RoomRepository {
         return false;
     }
 
+    // Delete room by roomId
+    public boolean deleteRoom(String roomId) {
+        for (List<Room> rooms : roomInventory.values()) {
+            rooms.removeIf(room -> room.getRoomId().equalsIgnoreCase(roomId));
+            System.out.println("Room deleted: " + roomId);
+            return true;
+        }
+        System.out.println("Room not found: " + roomId);
+        return false;
+    }
+
     // Show current availability
     public void showAvailableRooms() {
         System.out.println("Available Rooms:");
@@ -96,13 +105,17 @@ public class RoomRepository {
     }
 
     // Get all rooms in the inventory
-    public List<Room> getAllRooms() {
-        List<Room> allRooms = new ArrayList<>();
-        for (List<Room> rooms : roomInventory.values()) {
-            allRooms.addAll(rooms);
-        }
-        return allRooms;
+    public void getAllRooms() {
+        roomInventory.values().stream()
+        .flatMap(List::stream)
+        .filter(Room::isAvailable)
+        .collect(Collectors.groupingBy(
+            Room::getType,
+            Collectors.mapping(Room::getRoomId, Collectors.toList())
+        ))
+        .forEach((type, ids) -> System.out.println(type + " - " + String.join(", ", ids)));
     }
+
 
     // Get a room by its ID
     public Room getRoomById(String roomId) {
@@ -115,7 +128,7 @@ public class RoomRepository {
         }
         return null;
     }
-    
+
     /**
      * Updates an existing room in the repository.
      * If the room type is changed, the room will be moved to the new type's list.
@@ -127,11 +140,11 @@ public class RoomRepository {
         if (updatedRoom == null) {
             return false;
         }
-        
+
         // First, find and remove the existing room
         Room existingRoom = null;
         String existingType = null;
-        
+
         for (Map.Entry<String, List<Room>> entry : roomInventory.entrySet()) {
             for (Room room : entry.getValue()) {
                 if (room.getRoomId().equalsIgnoreCase(updatedRoom.getRoomId())) {
@@ -144,17 +157,17 @@ public class RoomRepository {
                 break;
             }
         }
-        
+
         // If room not found, return false
         if (existingRoom == null) {
             return false;
         }
-        
+
         // If the room type has changed, handle moving it to the new type list
         if (!existingType.equals(updatedRoom.getType())) {
             // Remove from old type list
             roomInventory.get(existingType).remove(existingRoom);
-            
+
             // Add to new type list (ensure the list exists)
             roomInventory.putIfAbsent(updatedRoom.getType(), new ArrayList<>());
             roomInventory.get(updatedRoom.getType()).add(updatedRoom);
@@ -163,7 +176,7 @@ public class RoomRepository {
             int index = roomInventory.get(existingType).indexOf(existingRoom);
             roomInventory.get(existingType).set(index, updatedRoom);
         }
-        
+
         return true;
     }
 }
