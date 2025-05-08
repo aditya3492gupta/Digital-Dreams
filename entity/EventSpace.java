@@ -43,4 +43,12 @@ public class EventSpace {
     public void setAvailable(boolean available) {
         isAvailable = available;
     }
+
+    public int getNoOfDays() {
+        return noOfDays;
+    }
+
+    public void setNoOfDays(int noOfDays) {
+        this.noOfDays = noOfDays;
+    }
 }
