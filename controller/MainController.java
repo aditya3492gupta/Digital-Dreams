@@ -3,13 +3,11 @@ package controller;
 import entity.*;
 import entity.cart.Cart;
 import entity.cart.CartItem;
-import java.util.List;
 import entity.user.Admin;
 import entity.user.RegularUser;
 import entity.user.ResourceManager;
 import entity.user.User;
 import java.util.List;
-import java.util.Scanner;
 import repository.CartRepository;
 import repository.EventSpaceRepository;
 import repository.RoomRepository;
@@ -73,12 +71,12 @@ public class MainController {
 
     public void start() {
         while (true) {
-            System.out.println("\n========= Welcome to Digital Dreams =========");
+            System.out.println("\n=============== Welcome to Digital Dreams ===============");
+            System.out.println();
             System.out.println("1. Admin Login");
             System.out.println("2. Regular User Login");
             System.out.println("3. Resource Manager Login");
             System.out.println("4. Register as Regular User");
-
             System.out.println("5. Exit");
             int choice = v.getIntInput("Enter your choice: ");
 
@@ -87,10 +85,8 @@ public class MainController {
                 case 2 -> regularUserLogin();
                 case 3 -> resourceManagerLogin();
                 case 4 -> registerRegularUser();
-                // case 5 -> registerResourceManager();
                 case 5 -> {
                     System.out.println("Exiting system...");
-                    return;
                 }
                 default -> System.out.println("Invalid choice.");
             }
@@ -119,11 +115,8 @@ public class MainController {
         User user = userService.login(email, password);
         if (user instanceof RegularUser) {
             System.out.println("Regular User logged in: " + user.getName());
-
             currentUserId = user.getEmail(); // Set current user
-
             setLoggedInUserEmail(email);
-
             userMenu();
             currentUserId = null; // Reset current user on logout
         } else {
@@ -131,18 +124,14 @@ public class MainController {
         }
     }
 
-    // Comments
     private void resourceManagerLogin() {
         String email = v.getStringInput("Email: ");
         String password = v.getStringInput("Password: ");
         User user = userService.login(email, password);
         if (user instanceof ResourceManager) {
             System.out.println("Resource Manager logged in: " + user.getName());
-
             currentUserId = user.getEmail(); // Set current user
-
             setLoggedInUserEmail(email);
-
             managerMenu();
             currentUserId = null;
         } else {
@@ -166,10 +155,9 @@ public class MainController {
         String address = v.getStringInput("Address: ");
         String phone = v.getStringInput("Phone: ");
         if (!Validation.isValidPhoneNumber(phone)) {
-            System.out.println("Enter correct phn no");
+            System.out.println("Enter correct Phone No.");
             return;
         }
-
         boolean success = userService.registerRegularUser(name, email, password, age, address, phone);
         System.out.println(success ? "User registered." : "Email already taken.");
     }
@@ -209,7 +197,6 @@ public class MainController {
             System.out.println("7. Manage Transportation");
             System.out.println("8. Manage Rooms");
             System.out.println("9. Manage Event Spaces");
-            // System.out.println("6. Update User Profile");
             System.out.println("10. View Available Resources");
             System.out.println("11. Logout");
             int choice = v.getIntInput("Choose an option: ");
@@ -224,7 +211,7 @@ public class MainController {
                             .forEach(m -> System.out.println(m.getName() + " - " + m.getEmail()));
                 }
                 case 2 -> registerRegularUser();
-                case 3 -> registerResourceManager(); // reuse existing method
+                case 3 -> registerResourceManager();
                 case 4 -> {
                     String email = v.getStringInput("Enter email of Regular User to delete: ");
 
@@ -242,9 +229,7 @@ public class MainController {
                         System.out.println("Manager not found.");
                     }
                 }
-
                 case 10 -> {
-
                     System.out.println("Wellness Facilities:");
                     wellnessFacilityService.showAvailableFacilities();
                     System.out.println("Available Vehicles:");
@@ -276,10 +261,8 @@ public class MainController {
             System.out.println("2. Manage Transportation");
             System.out.println("3. Manage Rooms");
             System.out.println("4. Manage Event Spaces");
-
             System.out.println("5. Update Manager Profile");
             System.out.println("6. Logout");
-
             int choice = v.getIntInput("Choose an option: ");
 
             switch (choice) {
@@ -292,7 +275,6 @@ public class MainController {
                     System.out.println("Logging out...");
                     return;
                 }
-
                 default -> System.out.println("Invalid choice.");
             }
         }
@@ -312,11 +294,7 @@ public class MainController {
             System.out.println("Enter correct phn no");
             return;
         }
-        
-
-
         boolean updated = userService.updateUserProfile(loggedInUserEmail, name, password, address, phone);
-
         System.out.println(updated ? "Profile updated successfully." : "Profile update failed.");
     }
 
@@ -340,7 +318,6 @@ public class MainController {
             System.out.println("10. Checkout");
             System.out.println("11. Update User Profile");
             System.out.println("12. Logout");
-
             int choice = v.getIntInput("Choose an option: ");
 
             switch (choice) {
@@ -370,11 +347,9 @@ public class MainController {
 
     // 5. Add methods for cart operations
     private void addRoomToCart() {
-        // Show available rooms
         System.out.println("\nAvailable Rooms:");
         roomService.getAllRooms();
         System.out.println();
-
 
         String roomId = v.getStringInput("Enter Room ID to add to cart: ");
         int noOfDays=v.getPositiveIntInput("Enter no. of Days: " );
@@ -403,12 +378,11 @@ public class MainController {
         if (space != null && space.isAvailable()) {
             // Get appropriate cost based on type
             double cost = 0.0;
-            if (space instanceof GoldEventSpace gold) {
-                cost = gold.getBookingCost();
-            } else if (space instanceof SilverEventSpace silver) {
-                cost = silver.getBookingCost();
-            } else if (space instanceof PlatinumEventSpace platinum) {
-                cost = platinum.getBookingCost();
+            switch (space) {
+                case GoldEventSpace gold -> cost = gold.getBookingCost();
+                case SilverEventSpace silver -> cost = silver.getBookingCost();
+                case PlatinumEventSpace platinum -> cost = platinum.getBookingCost();
+                default -> System.out.println("Unknown event space type.");
             }
 
             cartService.addEventSpaceToCart(currentUserId, space.getSpaceId(), space.getType(), cost,noOfDays);
@@ -421,12 +395,9 @@ public class MainController {
     private void addWellnessFacilityToCart() {
         // Show available facilities
         wellnessFacilityService.showAvailableFacilities();
-
         String facilityId = v.getStringInput("Facility ID to add to cart: ");
-
         int hours = v.getIntInput("Number of hours: ");
 
-        // We need to assume WellnessFacility has a getFacilityById method
         WellnessFacility facility = wellnessFacilityService.getFacilityById(facilityId);
         if (facility != null && facility.isAvailable()) {
             cartService.addWellnessFacilityToCart(
@@ -448,7 +419,6 @@ public class MainController {
         String vehicleId = v.getStringInput("Vehicle ID to add to cart: ");
         int noOfDays=v.getPositiveIntInput("No. Of Days: ");
 
-        // We need to assume TransportationService has a getVehicleById method
         Transportation vehicle = transportationService.getVehicleById(vehicleId);
         if (vehicle != null && vehicle.isAvailable()) {
             cartService.addVehicleToCart(
@@ -472,7 +442,6 @@ public class MainController {
 
         Cart cart = cartService.getCartForUser(currentUserId);
         List<CartItem> items = cart.getItems();
-
         if (items.isEmpty()) {
             System.out.println("Your cart is empty.");
             return;
@@ -486,7 +455,6 @@ public class MainController {
         }
 
         System.out.println("\nTotal: ₹" + cart.getTotalCost());
-
         System.out.println("\n1. Remove item from cart");
         System.out.println("2. Clear cart");
         System.out.println("3. Back to menu");
@@ -495,7 +463,6 @@ public class MainController {
         switch (choice) {
             case 1 -> {
                 int itemIndex = v.getIntInput("Enter item number to remove: ") - 1;
-
                 if (itemIndex >= 0 && itemIndex < items.size()) {
                     CartItem itemToRemove = items.get(itemIndex);
                     cartService.removeItemFromCart(currentUserId, itemToRemove.getItemId());
@@ -510,7 +477,6 @@ public class MainController {
             }
             case 3 -> {
                 System.out.println("Returning to menu...");
-                return;
             }
             default -> System.out.println("Invalid choice.");
         }
@@ -521,9 +487,7 @@ public class MainController {
             System.out.println("No user is logged in.");
             return;
         }
-
         Cart cart = cartService.getCartForUser(currentUserId);
-
         if (cart.getItems().isEmpty()) {
             System.out.println("Your cart is empty.");
             return;
@@ -563,7 +527,6 @@ public class MainController {
                     String id = v.getStringInput("Facility ID: ");
                     String type = v.getStringInput("Type: ");
                     double price = v.getPositiveDoubleInput("Price per Hour: ");
-                    
                     wellnessFacilityService.registerNewFacility(id, type, price);
                 }
                 case 2 -> {
@@ -586,7 +549,6 @@ public class MainController {
                     }
                 }
                 case 5 -> wellnessFacilityService.showAvailableFacilities();
-
                 case 6 -> {
                     System.out.println("Returning to previous menu...");
                     return;
@@ -639,15 +601,12 @@ public class MainController {
         System.out.println("4. Delete Room");
         System.out.println("5. Show Available Rooms");
         int choice = v.getIntInput("Choose an option: ");
-
         switch (choice) {
             case 1 -> {
                 String id = v.getStringInput("Room ID: ");
                 System.out.print("Type (2AC / 2NAC / 4AC / 4NAC): ");
                 String type = v.getStringInput("Type (2AC / 2NAC / 4AC / 4NAC): ");
                 double cost = v.getPositiveDoubleInput("Cost (in ₹): ");
-                int noOfDays=v.getPositiveIntInput(" No. Of Days: ");
-
                 boolean added = roomService.addRoom(id, type, true, cost);
                 if (added) {
                     System.out.println("Room added successfully.");
@@ -734,7 +693,6 @@ public class MainController {
                 if (booked != null) {
                     System.out.println("Event space booked successfully!");
                 }
-
             }
             case 5 -> {
                 // Display available spaces first
@@ -785,11 +743,13 @@ public class MainController {
         userService.registerResourceManager("Rajiv Mehta", "rajiv", "rajiv", 35, "9988776655");
         userService.registerResourceManager("Sonal Kapoor", "sonal", "sonal", 32, "8877665544");
 
+        //Vehicles Added
         transportationService.addVehicle("V101", "2-wheeler", 500.0, true);
         transportationService.addVehicle("V102", "2-wheeler", 500.0, true);
         transportationService.addVehicle("V103", "4-wheeler", 1000.0, true);
         transportationService.addVehicle("V104", "4-wheeler", 1000.0, true);
 
+        //Event Spaces Added
         EventSpace gold = new GoldEventSpace("Gold", true);
         EventSpace silver = new SilverEventSpace("Silver", true);
         EventSpace platinum = new PlatinumEventSpace("Platinum", true);
@@ -798,6 +758,7 @@ public class MainController {
         eventSpaceService.createEventSpace(silver);
         eventSpaceService.createEventSpace(platinum);
 
+        //Wellness Facilities Added
         wellnessFacilityService.registerNewFacility("SP1", "Swimming Pool", 200.0);
         wellnessFacilityService.registerNewFacility("SP2", "Swimming Pool", 200.0);
         wellnessFacilityService.registerNewFacility("GYM1", "Gym", 150.0);

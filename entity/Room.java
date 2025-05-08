@@ -58,7 +58,7 @@ public class Room {
         return noOfDays;
     }
 
-    public void setNoOfDays(double cost) {
+    public void setNoOfDays(int noOfDays) {
         this.noOfDays = noOfDays;
     }
 
