@@ -3,9 +3,8 @@ package service;
 import entity.user.RegularUser;
 import entity.user.ResourceManager;
 import entity.user.User;
-import repository.UserRepository;
-
 import java.util.List;
+import repository.UserRepository;
 
 public class UserService {
     private final UserRepository userRepository;
@@ -58,7 +57,7 @@ public class UserService {
     }
 
     // Update a user's profile based on email
-    public boolean updateUserProfile(String email, String name, String password) {
+    public boolean updateUserProfile(String email, String name, String password, String address, String phoneNumber) { 
         User user = getUserByEmail(email);
         if (user == null) {
             return false;
@@ -67,8 +66,7 @@ public class UserService {
         // Update the user's profile
         if (user instanceof RegularUser) {
             RegularUser updatedUser = new RegularUser(user.getId(), name, email, password,
-                    ((RegularUser) user).getAge(), ((RegularUser) user).getAddress(),
-                    ((RegularUser) user).getPhoneNumber());
+                    ((RegularUser) user).getAge(), address, phoneNumber);
             return userRepository.updateRegularUser(user.getId(), updatedUser);
         } else if (user instanceof ResourceManager) {
             ResourceManager updatedManager = new ResourceManager(user.getId(), name, email, password,

@@ -1,7 +1,6 @@
 package service;
 
 import entity.Room;
-import java.util.List;
 import repository.RoomRepository;
 
 public class RoomService {
@@ -42,8 +41,8 @@ public class RoomService {
         return roomRepository.releaseRoom(roomId);
     }
 
-    public List<Room> getAllRooms() {
-        return roomRepository.getAllRooms();
+    public void getAllRooms() {
+        roomRepository.getAllRooms();
     }
 
     public void showAvailableRooms() {
@@ -54,12 +53,6 @@ public class RoomService {
         return roomRepository.getRoomById(roomId);
     }
     
-    /**
-     * Updates an existing room in the system.
-     * 
-     * @param room The room with updated information
-     * @return true if the room was successfully updated, false otherwise
-     */
     public boolean updateRoom(Room room) {
         if (room == null) {
             System.out.println("Cannot update: room is null");

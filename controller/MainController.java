@@ -3,23 +3,21 @@ package controller;
 import entity.*;
 import entity.cart.Cart;
 import entity.cart.CartItem;
-import entity.user.*;
-import java.util.List;
-import java.util.Scanner;
-
 import entity.user.Admin;
 import entity.user.RegularUser;
 import entity.user.ResourceManager;
 import entity.user.User;
+import java.util.List;
+import java.util.Scanner;
+import repository.CartRepository;
 import repository.EventSpaceRepository;
 import repository.RoomRepository;
 import repository.TransportationRepository;
 import repository.UserRepository;
-import repository.CartRepository;
 import repository.WellnessFacilityRepository;
+import service.CartService;
 import service.EventSpaceService;
 import service.RoomService;
-import service.CartService;
 import service.TransportationService;
 import service.UserService;
 import service.WellnessFacilityService;
@@ -302,8 +300,15 @@ public class MainController {
             System.out.println("Password too weak.");
             return;
         }
+        String address = v.getStringInput("New Address: ");
+        String phone = v.getStringInput("New Phone: ");
+        if (!Validation.isValidPhoneNumber(phone)) {
+            System.out.println("Enter correct phn no");
+            return;
+        }
+        
 
-        boolean updated = userService.updateUserProfile(loggedInUserEmail, name, password);
+        boolean updated = userService.updateUserProfile(loggedInUserEmail, name, password, address, phone);
         System.out.println(updated ? "Profile updated successfully." : "Profile update failed.");
     }
 
@@ -358,9 +363,11 @@ public class MainController {
     // 5. Add methods for cart operations
     private void addRoomToCart() {
         // Show available rooms
-        roomService.showAvailableRooms();
+        System.out.println("\nAvailable Rooms:");
+        roomService.getAllRooms();
+        System.out.println();
 
-        String roomId = v.getStringInput("Room ID to add to cart: ");
+        String roomId = v.getStringInput("Enter Room ID to add to cart: ");
 
         Room room = roomService.getRoomById(roomId);
         if (room != null && room.isAvailable()) {
@@ -519,6 +526,7 @@ public class MainController {
                 System.out.println("Checkout successful! All items have been booked.");
             } else {
                 System.out.println("Checkout failed. Some items may no longer be available.");
+                cartService.clearCart(currentUserId);
             }
         } else {
             System.out.println("Checkout cancelled.");
@@ -733,8 +741,8 @@ public class MainController {
         userService.registerResourceManager("Sonal Kapoor", "sonal", "sonal", 32, "8877665544");
 
         transportationService.addVehicle("V101", "2-wheeler", 500.0, true);
-        transportationService.addVehicle("V102", "4-wheeler", 1000.0, true);
-        transportationService.addVehicle("V103", "2-wheeler", 500.0, true);
+        transportationService.addVehicle("V102", "2-wheeler", 500.0, true);
+        transportationService.addVehicle("V103", "4-wheeler", 1000.0, true);
         transportationService.addVehicle("V104", "4-wheeler", 1000.0, true);
 
         EventSpace gold = new GoldEventSpace("Gold", true);
