@@ -5,13 +5,22 @@ public class Room {
     private String type;
     private boolean isAvailable;
     private double cost;
+    private int noOfDays;
 
+    public Room(String roomId, String type, boolean isAvailable, double cost, int noOfDays) {
+        this.roomId = roomId;
+        this.type = type;
+        this.isAvailable = isAvailable;
+        this.cost = cost;
+        this.noOfDays=noOfDays;
+    }
     public Room(String roomId, String type, boolean isAvailable, double cost) {
         this.roomId = roomId;
         this.type = type;
         this.isAvailable = isAvailable;
         this.cost = cost;
     }
+
 
     public String getRoomId() {
         return roomId;
@@ -43,6 +52,14 @@ public class Room {
 
     public void setCost(double cost) {
         this.cost = cost;
+    }
+
+    public double getNoOfDays() {
+        return noOfDays;
+    }
+
+    public void setNoOfDays(double cost) {
+        this.noOfDays = noOfDays;
     }
 
     @Override

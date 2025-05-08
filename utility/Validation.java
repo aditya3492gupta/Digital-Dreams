@@ -60,6 +60,22 @@ public class Validation {
             System.out.print(prompt);
             try {
                 int value = Integer.parseInt(scanner.nextLine());
+                if (value > 0) {
+                    return value;
+                } else {
+                    System.out.println("Invalid input. Please enter a  integer greater than 18.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid integer.");
+            }
+        }
+    }
+
+    public int getPositiveAgeInput(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            try {
+                int value = Integer.parseInt(scanner.nextLine());
                 if (value > 18) {
                     return value;
                 } else {

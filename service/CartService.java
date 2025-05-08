@@ -45,23 +45,23 @@ public class CartService {
         return cartRepository.getCartForUser(userId);
     }
 
-    public boolean addRoomToCart(String userId, String roomId, String roomType, double cost) {
+    public boolean addRoomToCart(String userId, String roomId, String roomType, double cost,int noOfDays) {
         Cart cart = getCartForUser(userId);
-        cart.addItem(new RoomCartItem(roomId, roomType, cost));
+        cart.addItem(new RoomCartItem(roomId, roomType, cost,noOfDays));
         cartRepository.saveCart(cart);
         return true;
     }
 
-    public boolean addEventSpaceToCart(String userId, String spaceId, String spaceType, double cost) {
+    public boolean addEventSpaceToCart(String userId, String spaceId, String spaceType, double cost,int noOfDays) {
         Cart cart = getCartForUser(userId);
-        cart.addItem(new EventSpaceCartItem(spaceId, spaceType, cost));
+        cart.addItem(new EventSpaceCartItem(spaceId, spaceType, cost, noOfDays));
         cartRepository.saveCart(cart);
         return true;
     }
 
-    public boolean addVehicleToCart(String userId, String vehicleId, String vehicleType, double cost) {
+    public boolean addVehicleToCart(String userId, String vehicleId, String vehicleType, double cost,int noOfDays) {
         Cart cart = getCartForUser(userId);
-        cart.addItem(new TransportationCartItem(vehicleId, vehicleType, cost));
+        cart.addItem(new TransportationCartItem(vehicleId, vehicleType, cost,noOfDays));
         cartRepository.saveCart(cart);
         return true;
     }
