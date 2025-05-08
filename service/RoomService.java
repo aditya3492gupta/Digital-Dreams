@@ -19,7 +19,7 @@ public class RoomService {
     public Room bookRoom(String type) {
         return roomRepository.bookRoom(type);
     }
-    
+
     /**
      * Books a specific room by its ID.
      * 
@@ -50,10 +50,14 @@ public class RoomService {
         roomRepository.showAvailableRooms();
     }
 
+    public boolean deleteRoom(String roomId) {
+        return roomRepository.deleteRoom(roomId);
+    }
+
     public Room getRoomById(String roomId) {
         return roomRepository.getRoomById(roomId);
     }
-    
+
     /**
      * Updates an existing room in the system.
      * 
@@ -65,16 +69,16 @@ public class RoomService {
             System.out.println("Cannot update: room is null");
             return false;
         }
-        
+
         Room existingRoom = roomRepository.getRoomById(room.getRoomId());
-        
+
         if (existingRoom == null) {
             System.out.println("Cannot update: room not found with ID: " + room.getRoomId());
             return false;
         }
-        
+
         boolean updated = roomRepository.updateRoom(room);
-        
+
         if (updated) {
             System.out.println("Successfully updated room: " + room.getRoomId());
             if (!existingRoom.getType().equals(room.getType())) {
@@ -83,7 +87,7 @@ public class RoomService {
         } else {
             System.out.println("Failed to update room: " + room.getRoomId());
         }
-        
+
         return updated;
     }
 }

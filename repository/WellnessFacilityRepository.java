@@ -29,6 +29,10 @@ public class WellnessFacilityRepository {
         return true;
     }
 
+    public boolean deleteFacility(String facilityId) {
+        return facilities.removeIf(f -> f.getFacilityId().equals(facilityId));
+    }
+
     public WellnessFacility bookFacility(String facilityType) {
         Optional<WellnessFacility> facilityToBook = facilities.stream()
                 .filter(f -> f.getType().equalsIgnoreCase(facilityType) && f.isAvailable())
@@ -61,18 +65,17 @@ public class WellnessFacilityRepository {
         if (updatedFacility == null) {
             return false;
         }
-        
+
         for (int i = 0; i < facilities.size(); i++) {
             if (facilities.get(i).getFacilityId().equals(updatedFacility.getFacilityId())) {
                 facilities.set(i, updatedFacility);
                 return true;
             }
         }
-        
+
         // Facility not found
         return false;
     }
-
 
     public List<WellnessFacility> getAllFacilities() {
         return new ArrayList<>(facilities);
@@ -85,10 +88,9 @@ public class WellnessFacilityRepository {
                 .orElse(null);
     }
 
-    
     public void showAvailableFacilities() {
         System.out.println("Available Wellness Facilities:");
-        
+
         facilities.stream()
                 .filter(WellnessFacility::isAvailable)
                 .forEach(facility -> {
