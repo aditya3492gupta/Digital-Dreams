@@ -50,6 +50,7 @@ public class RoomService {
         roomRepository.showAvailableRooms();
     }
 
+    // delete room by id
     public boolean deleteRoom(String roomId) {
         return roomRepository.deleteRoom(roomId);
     }

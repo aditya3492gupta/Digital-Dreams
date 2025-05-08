@@ -43,7 +43,6 @@ public class RoomRepository {
         return true;
     }
 
-    // Get all rooms of a type
     public List<Room> getRoomsByType(String type) {
         return roomInventory.getOrDefault(type, new ArrayList<>());
     }

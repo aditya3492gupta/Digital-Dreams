@@ -25,7 +25,6 @@ public class TransportationRepository {
         return true;
     }
 
-    // In TransportationRepository.java
     public boolean deleteVehicle(String vehicleId) {
         for (int i = 0; i < vehicles.size(); i++) {
             if (vehicles.get(i).getVehicleId().equalsIgnoreCase(vehicleId)) {

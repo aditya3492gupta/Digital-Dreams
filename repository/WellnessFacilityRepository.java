@@ -29,6 +29,7 @@ public class WellnessFacilityRepository {
         return true;
     }
 
+    // delete
     public boolean deleteFacility(String facilityId) {
         return facilities.removeIf(f -> f.getFacilityId().equals(facilityId));
     }

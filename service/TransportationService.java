@@ -48,7 +48,6 @@ public class TransportationService {
         return false;
     }
 
-    // Method to release a vehicle based on its ID
     public boolean releaseVehicle(String vehicleId) {
         return transportationRepository.releaseVehicle(vehicleId);
     }

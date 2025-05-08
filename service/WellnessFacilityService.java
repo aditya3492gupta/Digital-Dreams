@@ -59,6 +59,7 @@ public class WellnessFacilityService {
         }
     }
 
+    // delete functions
     public boolean deleteFacility(String facilityId) {
         boolean deleted = repository.deleteFacility(facilityId);
         if (deleted) {

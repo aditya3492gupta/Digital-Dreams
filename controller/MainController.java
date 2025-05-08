@@ -3,7 +3,6 @@ package controller;
 import entity.*;
 import entity.cart.Cart;
 import entity.cart.CartItem;
-import entity.user.*;
 import java.util.List;
 import java.util.Scanner;
 
@@ -37,8 +36,6 @@ public class MainController {
     private String currentUserId = null;
 
     private String loggedInUserEmail;
-
-    private final Scanner scanner = new Scanner(System.in);
 
     public MainController() {
         UserRepository userRepository = new UserRepository();
