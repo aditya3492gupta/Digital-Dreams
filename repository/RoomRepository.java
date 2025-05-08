@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class RoomRepository {
     private Map<String, List<Room>> roomInventory;
@@ -104,13 +105,17 @@ public class RoomRepository {
     }
 
     // Get all rooms in the inventory
-    public List<Room> getAllRooms() {
-        List<Room> allRooms = new ArrayList<>();
-        for (List<Room> rooms : roomInventory.values()) {
-            allRooms.addAll(rooms);
-        }
-        return allRooms;
+    public void getAllRooms() {
+        roomInventory.values().stream()
+        .flatMap(List::stream)
+        .filter(Room::isAvailable)
+        .collect(Collectors.groupingBy(
+            Room::getType,
+            Collectors.mapping(Room::getRoomId, Collectors.toList())
+        ))
+        .forEach((type, ids) -> System.out.println(type + " - " + String.join(", ", ids)));
     }
+
 
     // Get a room by its ID
     public Room getRoomById(String roomId) {
