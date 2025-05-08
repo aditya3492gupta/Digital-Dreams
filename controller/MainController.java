@@ -3,6 +3,7 @@ package controller;
 import entity.*;
 import entity.cart.Cart;
 import entity.cart.CartItem;
+import java.util.List;
 import entity.user.Admin;
 import entity.user.RegularUser;
 import entity.user.ResourceManager;
@@ -35,8 +36,6 @@ public class MainController {
     private String currentUserId = null;
 
     private String loggedInUserEmail;
-
-    private final Scanner scanner = new Scanner(System.in);
 
     public MainController() {
         UserRepository userRepository = new UserRepository();
@@ -206,10 +205,13 @@ public class MainController {
             System.out.println("3. Add Resource Manager");
             System.out.println("4. Delete Regular User");
             System.out.println("5. Delete Resource Manager");
-
+            System.out.println("6. Manage Wellness Facilities");
+            System.out.println("7. Manage Transportation");
+            System.out.println("8. Manage Rooms");
+            System.out.println("9. Manage Event Spaces");
             // System.out.println("6. Update User Profile");
-            System.out.println("6. View Available Resources");
-            System.out.println("7. Logout");
+            System.out.println("10. View Available Resources");
+            System.out.println("11. Logout");
             int choice = v.getIntInput("Choose an option: ");
 
             switch (choice) {
@@ -241,7 +243,7 @@ public class MainController {
                     }
                 }
 
-                case 6 -> {
+                case 10 -> {
 
                     System.out.println("Wellness Facilities:");
                     wellnessFacilityService.showAvailableFacilities();
@@ -254,7 +256,11 @@ public class MainController {
                     available.stream().filter(EventSpace::isAvailable)
                             .forEach(e -> System.out.println(e.getSpaceId() + " - " + e.getType()));
                 }
-                case 7 -> {
+                case 6 -> wellnessFacilityMenu();
+                case 7 -> transportationMenu();
+                case 8 -> roomMenu();
+                case 9 -> eventSpaceMenu();
+                case 11 -> {
                     System.out.println("Logging out...");
                     return;
                 }
@@ -308,7 +314,9 @@ public class MainController {
         }
         
 
+
         boolean updated = userService.updateUserProfile(loggedInUserEmail, name, password, address, phone);
+
         System.out.println(updated ? "Profile updated successfully." : "Profile update failed.");
     }
 
@@ -539,8 +547,9 @@ public class MainController {
             System.out.println("1. Register New Facility");
             System.out.println("2. Book Facility");
             System.out.println("3. Release Facility");
-            System.out.println("4. Show Available Facilities");
-            System.out.println("5. Back to Previous Menu");
+            System.out.println("4. Delete Facility");
+            System.out.println("5. Show Available Facilities");
+            System.out.println("6. Back to Previous Menu");
             int choice = v.getIntInput("Choose an option: ");
 
             switch (choice) {
@@ -560,8 +569,19 @@ public class MainController {
                     String id = v.getStringInput("Enter facility ID to release: ");
                     wellnessFacilityService.releaseFacility(id);
                 }
-                case 4 -> wellnessFacilityService.showAvailableFacilities();
-                case 5 -> {
+                case 4 -> {
+                    wellnessFacilityService.showAvailableFacilities();
+                    String id = v.getStringInput("Enter facility ID to delete: ");
+                    boolean deleted = wellnessFacilityService.deleteFacility(id);
+                    if (deleted) {
+                        System.out.println("Facility deleted successfully!");
+                    } else {
+                        System.out.println("Failed to delete. Facility not found.");
+                    }
+                }
+                case 5 -> wellnessFacilityService.showAvailableFacilities();
+
+                case 6 -> {
                     System.out.println("Returning to previous menu...");
                     return;
                 }
@@ -575,7 +595,8 @@ public class MainController {
         System.out.println("1. Add Vehicle");
         System.out.println("2. Book Vehicle");
         System.out.println("3. Release Vehicle");
-        System.out.println("4. Show Available Vehicles");
+        System.out.println("4. Delete Vehicle");
+        System.out.println("5. Show Available Vehicles");
         int choice = v.getIntInput("Choose an option: ");
 
         switch (choice) {
@@ -594,7 +615,12 @@ public class MainController {
                 String id = v.getStringInput("Type vehicle ID to release: ");
                 transportationService.releaseVehicle(id);
             }
-            case 4 -> transportationService.showAvailableVehicles();
+            case 4 -> {
+                transportationService.showAvailableVehicles();
+                String id = v.getStringInput("Type vehicle ID to delete: ");
+                transportationService.deleteVehicle(id);
+            }
+            case 5 -> transportationService.showAvailableVehicles();
             default -> System.out.println("Invalid choice.");
         }
     }
@@ -604,7 +630,8 @@ public class MainController {
         System.out.println("1. Add Room");
         System.out.println("2. Book Room");
         System.out.println("3. Release Room");
-        System.out.println("4. Show Available Rooms");
+        System.out.println("4. Delete Room");
+        System.out.println("5. Show Available Rooms");
         int choice = v.getIntInput("Choose an option: ");
 
         switch (choice) {
@@ -640,7 +667,18 @@ public class MainController {
                     System.out.println("Failed to release room.");
                 }
             }
-            case 4 -> roomService.showAvailableRooms();
+            case 4 -> {
+                roomService.showAvailableRooms();
+                String id = v.getStringInput("Room ID to delete: ");
+                boolean deleted = roomService.deleteRoom(id);
+                if (deleted) {
+                    System.out.println("Room deleted successfully.");
+                } else {
+                    System.out.println("Failed to delete room. Room not found.");
+                }
+            }
+            case 5 -> roomService.showAvailableRooms();
+
             default -> System.out.println("Invalid choice.");
         }
     }

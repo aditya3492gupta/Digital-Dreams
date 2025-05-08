@@ -28,7 +28,7 @@ public class TransportationService {
             System.out.println("Booking failed. Vehicle not found or already booked.");
         }
     }
-    
+
     /**
      * Books a specific vehicle by ID.
      * 
@@ -48,7 +48,6 @@ public class TransportationService {
         return false;
     }
 
-    // Method to release a vehicle based on its ID
     public boolean releaseVehicle(String vehicleId) {
         return transportationRepository.releaseVehicle(vehicleId);
     }
@@ -69,11 +68,21 @@ public class TransportationService {
         return transportationRepository.getVehicleById(vehicleId);
     }
 
+    // In TransportationService.java
+    public void deleteVehicle(String vehicleId) {
+        boolean isDeleted = transportationRepository.deleteVehicle(vehicleId);
+        if (isDeleted) {
+            System.out.println("Vehicle " + vehicleId + " deleted successfully.");
+        } else {
+            System.out.println("Vehicle " + vehicleId + " not found.");
+        }
+    }
+
     // Method to cancel a vehicle booking by vehicle ID
     public boolean cancelBooking(String vehicleId) {
         return transportationRepository.cancelBooking(vehicleId);
     }
-    
+
     /**
      * Updates an existing vehicle in the system.
      * 
@@ -85,22 +94,22 @@ public class TransportationService {
             System.out.println("Cannot update: vehicle is null");
             return false;
         }
-        
+
         Transportation existingVehicle = transportationRepository.getVehicleById(vehicle.getVehicleId());
-        
+
         if (existingVehicle == null) {
             System.out.println("Cannot update: vehicle not found with ID: " + vehicle.getVehicleId());
             return false;
         }
-        
+
         boolean updated = transportationRepository.updateVehicle(vehicle);
-        
+
         if (updated) {
             System.out.println("Successfully updated vehicle: " + vehicle.getVehicleId());
         } else {
             System.out.println("Failed to update vehicle: " + vehicle.getVehicleId());
         }
-        
+
         return updated;
     }
 }

@@ -39,7 +39,6 @@ public class EventSpaceService {
         return false;
     }
 
-    // Delete an EventSpace
     public boolean deleteEventSpace(String spaceId) {
         if (eventSpaceRepository.getEventSpace(spaceId) != null) {
             eventSpaceRepository.deleteEventSpace(spaceId);
@@ -55,20 +54,22 @@ public class EventSpaceService {
 
     /**
      * Book a specific event space by its ID
+     * 
      * @param spaceId the ID of the event space to book
-     * @return the booked EventSpace if successful, null if the space doesn't exist or is already booked
+     * @return the booked EventSpace if successful, null if the space doesn't exist
+     *         or is already booked
      */
     public EventSpace bookEventSpace(String spaceId) {
         EventSpace space = eventSpaceRepository.getEventSpace(spaceId);
         if (space != null && space.isAvailable()) {
             space.setAvailable(false);
             eventSpaceRepository.updateEventSpace(space);
-            
+
             System.out.println("Event space booked: " + space.getSpaceId());
             printBookingDetails(space);
             return space;
         }
-        
+
         if (space == null) {
             System.out.println("Event space with ID " + spaceId + " not found.");
         } else {
@@ -79,8 +80,11 @@ public class EventSpaceService {
 
     /**
      * Book an available EventSpace of a given type
-     * @param type the type of event space to book (e.g., "Gold", "Silver", "Platinum")
-     * @return the booked EventSpace if successful, null if no spaces of that type are available
+     * 
+     * @param type the type of event space to book (e.g., "Gold", "Silver",
+     *             "Platinum")
+     * @return the booked EventSpace if successful, null if no spaces of that type
+     *         are available
      */
     public EventSpace bookEventSpaceByType(String type) {
         List<EventSpace> available = eventSpaceRepository.findAvailableSpacesByType(type);
@@ -98,9 +102,10 @@ public class EventSpaceService {
         printBookingDetails(selected);
         return selected;
     }
-    
+
     /**
      * Release a booked event space (make it available again)
+     * 
      * @param spaceId the ID of the event space to release
      * @return true if the space was successfully released, false otherwise
      */
@@ -112,7 +117,7 @@ public class EventSpaceService {
             System.out.println("Event space released: " + spaceId);
             return true;
         }
-        
+
         if (space == null) {
             System.out.println("Event space with ID " + spaceId + " not found.");
         } else {
@@ -120,7 +125,7 @@ public class EventSpaceService {
         }
         return false;
     }
-    
+
     // Helper method to print booking details
     private void printBookingDetails(EventSpace space) {
         double cost = 0.0;
